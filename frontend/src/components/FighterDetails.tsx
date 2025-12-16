@@ -1,13 +1,12 @@
-import { Box, Typography, Chip, Divider, Button } from "@mui/material";
+import { Box, Typography, Chip, Divider } from "@mui/material";
 import type { Fighter } from "../types";
 
 type Props = {
   fighter: Fighter | null;
   mode?: "preview" | "full";
-  onOpenFull?: () => void;
 };
 
-export default function FighterDetails({ fighter, mode = "preview", onOpenFull }: Props) {
+export default function FighterDetails({ fighter, mode = "preview" }: Props) {
   if (!fighter) {
     return (
       <Box
@@ -17,8 +16,9 @@ export default function FighterDetails({ fighter, mode = "preview", onOpenFull }
           borderRadius: 3,
           p: 2,
           color: "white",
-          position: "sticky",
-          top: 16,
+          height: mode === "preview" ? { lg: "100%" } : "auto",
+          display: "flex",
+          alignItems: "center",
         }}
       >
         <Typography sx={{ opacity: 0.8 }}>
@@ -46,13 +46,18 @@ export default function FighterDetails({ fighter, mode = "preview", onOpenFull }
         borderRadius: 3,
         overflow: "hidden",
         color: "white",
-        position: mode === "preview" ? "sticky" : "relative",
-        top: mode === "preview" ? 16 : "auto",
+
+        // preview panelhez igazodunk (App.tsx ad magasságot)
+        height: mode === "preview" ? { lg: "100%" } : "auto",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
       }}
     >
       <Box
         sx={{
           height: mode === "full" ? 420 : 320,
+          flexShrink: 0,
           bgcolor: "#0c0c0c",
           display: "flex",
           alignItems: "center",
@@ -71,7 +76,15 @@ export default function FighterDetails({ fighter, mode = "preview", onOpenFull }
         )}
       </Box>
 
-      <Box sx={{ p: 2 }}>
+      <Box
+        sx={{
+          p: 2,
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          minHeight: 0,
+        }}
+      >
         <Typography variant="h5" sx={{ fontWeight: 900 }}>
           {fighter.name}
         </Typography>
@@ -99,38 +112,19 @@ export default function FighterDetails({ fighter, mode = "preview", onOpenFull }
 
         <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.10)" }} />
 
-        <Typography
+        {/* preview-ben belső scroll, full-ban sima */}
+        <Box
           sx={{
-            opacity: 0.9,
-            whiteSpace: "pre-wrap",
-            lineHeight: 1.6,
-            ...(mode === "preview"
-              ? {
-                  display: "-webkit-box",
-                  WebkitLineClamp: 6,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                }
-              : {}),
+            flexGrow: 1,
+            minHeight: 0,
+            overflowY: mode === "preview" ? "auto" : "visible",
+            pr: mode === "preview" ? 1 : 0,
           }}
         >
-          {szoveg || "No description."}
-        </Typography>
-
-        {mode === "preview" && onOpenFull ? (
-          <Button
-            onClick={onOpenFull}
-            sx={{
-              mt: 2,
-              bgcolor: "rgba(255,255,255,0.08)",
-              color: "white",
-              fontWeight: 900,
-              "&:hover": { bgcolor: "rgba(255,255,255,0.14)" },
-            }}
-          >
-            Open full details
-          </Button>
-        ) : null}
+          <Typography sx={{ opacity: 0.9, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+            {szoveg || "No description."}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

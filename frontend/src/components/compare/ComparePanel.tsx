@@ -1,4 +1,5 @@
 import { Autocomplete, Box, TextField } from "@mui/material";
+import { useEffect, useMemo } from "react";
 import type { Fighter } from "../../types";
 import FighterCompareCard from "./FighterCompareCard";
 import TaleOfTheTape from "./TaleOfTheTape";
@@ -19,13 +20,55 @@ const inputSx = {
   "& .MuiOutlinedInput-notchedOutline": {
     borderColor: "rgba(255,255,255,0.18)",
   },
+
+  /* X (clear) ikon */
+  "& .MuiAutocomplete-clearIndicator": {
+    color: "rgba(255,255,255,0.75)",
+  },
+  "& .MuiAutocomplete-clearIndicator:hover": {
+    color: "#fff",
+  },
+
+  /* lenyíló nyíl */
+  "& .MuiAutocomplete-popupIndicator": {
+    color: "rgba(255,255,255,0.75)",
+  },
+  "& .MuiAutocomplete-popupIndicator:hover": {
+    color: "#fff",
+  },
 };
 
-const labelSx = { sx: { color: "rgba(255,255,255,0.75)" } };
+
+const inputLabelSx = { color: "rgba(255,255,255,0.75)" };
+
+function divisionIdOf(f: Fighter | null): number | null {
+  return f?.division?.id ?? null;
+}
 
 export default function ComparePanel({ fighters, left, right, setLeft, setRight }: Props) {
-  const leftOptions = fighters.filter((f) => (right ? f.id !== right.id : true));
-  const rightOptions = fighters.filter((f) => (left ? f.id !== left.id : true));
+  const leftDivId = divisionIdOf(left);
+  const rightDivId = divisionIdOf(right);
+
+  const requiredDivIdForLeft = rightDivId;
+  const requiredDivIdForRight = leftDivId;
+
+  const leftOptions = useMemo(() => {
+    return fighters
+      .filter((f) => (right ? f.id !== right.id : true))
+      .filter((f) => (requiredDivIdForLeft ? f.division?.id === requiredDivIdForLeft : true));
+  }, [fighters, right, requiredDivIdForLeft]);
+
+  const rightOptions = useMemo(() => {
+    return fighters
+      .filter((f) => (left ? f.id !== left.id : true))
+      .filter((f) => (requiredDivIdForRight ? f.division?.id === requiredDivIdForRight : true));
+  }, [fighters, left, requiredDivIdForRight]);
+
+  useEffect(() => {
+    if (left && right && left.division?.id !== right.division?.id) {
+      setRight(null);
+    }
+  }, [left, right, setRight]);
 
   return (
     <Box sx={{ display: "grid", gap: 3 }}>
@@ -39,15 +82,23 @@ export default function ComparePanel({ fighters, left, right, setLeft, setRight 
         <Autocomplete
           options={leftOptions}
           value={left}
-          onChange={(_, val) => setLeft(val)}
+          onChange={(_, val) => {
+            setLeft(val);
+            if (val && right && right.division?.id !== val.division?.id) {
+              setRight(null);
+            }
+          }}
           getOptionLabel={(o) => o.name}
+          isOptionEqualToValue={(o, v) => o.id === v.id}
           renderInput={(params) => (
             <TextField
               {...params}
               label="Fighter A"
               variant="outlined"
-              InputLabelProps={labelSx}
               sx={inputSx}
+              slotProps={{
+                inputLabel: { sx: inputLabelSx },
+              }}
             />
           )}
         />
@@ -55,15 +106,23 @@ export default function ComparePanel({ fighters, left, right, setLeft, setRight 
         <Autocomplete
           options={rightOptions}
           value={right}
-          onChange={(_, val) => setRight(val)}
+          onChange={(_, val) => {
+            setRight(val);
+            if (val && left && left.division?.id !== val.division?.id) {
+              setLeft(null);
+            }
+          }}
           getOptionLabel={(o) => o.name}
+          isOptionEqualToValue={(o, v) => o.id === v.id}
           renderInput={(params) => (
             <TextField
               {...params}
               label="Fighter B"
               variant="outlined"
-              InputLabelProps={labelSx}
               sx={inputSx}
+              slotProps={{
+                inputLabel: { sx: inputLabelSx },
+              }}
             />
           )}
         />

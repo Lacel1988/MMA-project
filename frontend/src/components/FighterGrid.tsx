@@ -75,7 +75,14 @@ export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
             )}
           </Box>
 
-          <CardContent sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+          <CardContent
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              flexGrow: 1,
+              minHeight: 0,
+            }}
+          >
             <Typography
               variant="h6"
               sx={{
@@ -92,7 +99,19 @@ export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
             </Typography>
 
             <Chip
-              label={f.division?.name ?? "No division"}
+              label={
+                <Box
+                  sx={{
+                    display: "block",
+                    maxWidth: "100%",
+                    whiteSpace: "normal",
+                    lineHeight: 1.2,
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {f.division?.name ?? "No division"}
+                </Box>
+              }
               size="medium"
               sx={{
                 mt: 1,
@@ -100,8 +119,15 @@ export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
                 bgcolor: "#b71c1c",
                 color: "#fff",
                 fontWeight: "bold",
-                letterSpacing: 0.5,
+                letterSpacing: 0.3,
                 alignSelf: "flex-start",
+                maxWidth: "100%",
+                "& .MuiChip-label": {
+                  display: "block",
+                  whiteSpace: "normal",
+                  paddingTop: "6px",
+                  paddingBottom: "6px",
+                },
               }}
             />
 

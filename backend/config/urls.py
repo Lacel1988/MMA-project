@@ -6,10 +6,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # API root
+    
     path("api/", include("fighters.api.urls")),
 ]
 
-# MEDIA fájlok (DEV mód)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

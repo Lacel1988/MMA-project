@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Typography, Button, Box, Chip } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box, Chip, Container } from "@mui/material";
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth";
 
@@ -7,11 +7,13 @@ export default function Navbar({
   setAktivFül,
   user,
   onLogout,
+  height = 64,
 }: {
   aktivFül: Ful;
   setAktivFül: (f: Ful) => void;
   user: { username: string } | null;
   onLogout: () => void;
+  height?: number;
 }) {
   const gomb = (felirat: Ful) => (
     <Button
@@ -41,45 +43,59 @@ export default function Navbar({
 
   return (
     <AppBar
-      position="sticky"
+      position="fixed"
       elevation={0}
-      sx={{ bgcolor: "#0b0b0b", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+      sx={{
+        bgcolor: "#0b0b0b",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        backdropFilter: "blur(8px)",
+      }}
     >
-      <Toolbar sx={{ gap: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1 }}>
-          MMA <span style={{ color: "#b71c1c" }}>PROJECT</span>
-        </Typography>
+      <Toolbar sx={{ minHeight: height }}>
+        <Container
+          maxWidth="lg"
+          sx={{
+            px: { xs: 1.5, md: 2 },
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1 }}>
+            MMA <span style={{ color: "#b71c1c" }}>PROJECT</span>
+          </Typography>
 
-        <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }} />
 
-        {user ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Chip
-              label={`Hi, ${user.username}`}
-              sx={{ bgcolor: "rgba(255,255,255,0.08)", color: "white" }}
-            />
-            <Button
-              onClick={onLogout}
-              sx={{
-                textTransform: "none",
-                fontWeight: 900,
-                borderRadius: 2,
-                color: "white",
-                bgcolor: "rgba(255,255,255,0.06)",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
-              }}
-            >
-              Logout
-            </Button>
+          {user ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Chip
+                label={`Hi, ${user.username}`}
+                sx={{ bgcolor: "rgba(255,255,255,0.08)", color: "white" }}
+              />
+              <Button
+                onClick={onLogout}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 900,
+                  borderRadius: 2,
+                  color: "white",
+                  bgcolor: "rgba(255,255,255,0.06)",
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
+          ) : null}
+
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {gomb("Fighters")}
+            {gomb("Details")}
+            {gomb("Compare")}
+            {gomb("Auth")}
           </Box>
-        ) : null}
-
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {gomb("Fighters")}
-          {gomb("Details")}
-          {gomb("Compare")}
-          {gomb("Auth")}
-        </Box>
+        </Container>
       </Toolbar>
     </AppBar>
   );
