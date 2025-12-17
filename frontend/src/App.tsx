@@ -60,6 +60,88 @@ export default function App() {
     setAktivFül("Auth");
   }
 
+  const tartalom = hiba ? (
+    <Typography sx={{ color: "#ff6b6b" }}>Error: {hiba}</Typography>
+  ) : (
+    <>
+      {/* AUTH */}
+      {aktivFül === "Auth" && (
+        <Box
+          sx={{
+            display: "grid",
+            gap: 3,
+            gridTemplateColumns: { xs: "1fr", lg: "520px 1fr" },
+            alignItems: "stretch",
+            minHeight: { lg: `calc(100vh - ${NAV_H}px - 48px)` },
+          }}
+        >
+          <Box>
+            <Typography variant="h4" sx={{ mb: 2, color: "white" }}>
+              Auth
+            </Typography>
+
+            <AuthPanel
+              onLoginSuccess={(me) => {
+                setUser({ username: me.username });
+                setAktivFül("Fighters");
+              }}
+            />
+          </Box>
+
+          <AuthHero images={["/hero/hero1.jpg", "/hero/hero2.jpg", "/hero/hero3.jpg"]} />
+        </Box>
+      )}
+
+      {/* FIGHTERS */}
+      {aktivFül === "Fighters" && (
+        <Box
+          sx={{
+            display: "grid",
+            gap: 3,
+            gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" },
+            alignItems: "start",
+          }}
+        >
+          <Box sx={{ minWidth: 0 }}>
+            <FighterGrid
+              fighters={fighters}
+              selectedId={kivalasztott?.id ?? null}
+              onSelect={(f) => setKivalasztott(f)}
+            />
+          </Box>
+
+          <Box
+            sx={{
+              minWidth: 0,
+              position: { lg: "sticky" },
+              top: { lg: 12 },
+              alignSelf: "start",
+              pt: { lg: 8 },
+            }}
+          >
+            <FighterDetails fighter={kivalasztott} mode="preview" />
+          </Box>
+        </Box>
+      )}
+
+      {/* DETAILS */}
+      {aktivFül === "Details" && (
+        <FighterDetails fighter={kivalasztott} mode="full" />
+      )}
+
+      {/* COMPARE */}
+      {aktivFül === "Compare" && (
+        <ComparePanel
+          fighters={fighters}
+          left={left}
+          right={right}
+          setLeft={setLeft}
+          setRight={setRight}
+        />
+      )}
+    </>
+  );
+
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#0b0b0b" }}>
       <Navbar
@@ -70,7 +152,6 @@ export default function App() {
         onLogout={handleLogout}
       />
 
-      {/* spacer a fixed navbar alá */}
       <Box sx={{ height: NAV_H }} />
 
       <Box
@@ -80,91 +161,23 @@ export default function App() {
           bgcolor: "#0b0b0b",
         }}
       >
-        <Container maxWidth="xl" sx={{ py: 3 }}>
-          {hiba ? (
-            <Typography sx={{ color: "#ff6b6b" }}>Error: {hiba}</Typography>
-          ) : (
-            <>
-              {/* AUTH */}
-              {aktivFül === "Auth" && (
-                <Box
-                  sx={{
-                    display: "grid",
-                    gap: 3,
-                    gridTemplateColumns: { xs: "1fr", lg: "520px 1fr" },
-                    alignItems: "stretch",
-                    minHeight: { lg: `calc(100vh - ${NAV_H}px - 48px)` },
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h4" sx={{ mb: 2, color: "white" }}>
-                      Auth
-                    </Typography>
-
-                    <AuthPanel
-                      onLoginSuccess={(me) => {
-                        setUser({ username: me.username });
-                        setAktivFül("Fighters");
-                      }}
-                    />
-                  </Box>
-
-                  <AuthHero images={["/hero/hero1.jpg", "/hero/hero2.jpg", "/hero/hero3.jpg"]} />
-                </Box>
-              )}
-
-              {/* FIGHTERS */}
-              {aktivFül === "Fighters" && (
-                <Box
-                  sx={{
-                    display: "grid",
-                    gap: 3,
-                    gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" },
-                    alignItems: "start",
-                  }}
-                >
-                  {/* BAL: sima page-scroll, nincs belső levágás */}
-                  <Box sx={{ minWidth: 0 }}>
-                    <FighterGrid
-                      fighters={fighters}
-                      selectedId={kivalasztott?.id ?? null}
-                      onSelect={(f) => setKivalasztott(f)}
-                    />
-                  </Box>
-
-                  {/* JOBB: sticky, hogy szemlézés közben látszódjon */}
-                  <Box
-                    sx={{
-                      minWidth: 0,
-                      position: { lg: "sticky" },
-                      top: { lg: 12 },
-                      alignSelf: "start",
-                      pt: { lg: 8 },
-                    }}
-                  >
-                    <FighterDetails fighter={kivalasztott} mode="preview" />
-                  </Box>
-                </Box>
-              )}
-
-              {/* DETAILS */}
-              {aktivFül === "Details" && (
-                <FighterDetails fighter={kivalasztott} mode="full" />
-              )}
-
-              {/* COMPARE */}
-              {aktivFül === "Compare" && (
-                <ComparePanel
-                  fighters={fighters}
-                  left={left}
-                  right={right}
-                  setLeft={setLeft}
-                  setRight={setRight}
-                />
-              )}
-            </>
-          )}
-        </Container>
+        {/* Compare alatt nem Container: saját stage */}
+        {aktivFül === "Compare" ? (
+          <Box sx={{ py: 3, px: { xs: 2, sm: 3, md: 4 } }}>
+            <Box
+              sx={{
+                maxWidth: 1100,
+                mx: "auto",
+              }}
+            >
+              {tartalom}
+            </Box>
+          </Box>
+        ) : (
+          <Container maxWidth="xl" sx={{ py: 3 }}>
+            {tartalom}
+          </Container>
+        )}
       </Box>
     </Box>
   );

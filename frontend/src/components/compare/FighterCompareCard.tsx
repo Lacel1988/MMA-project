@@ -29,8 +29,8 @@ export default function FighterCompareCard({ fighter, title }: Props) {
           <Box sx={{ mt: 1, display: "flex", gap: 2, alignItems: "center" }}>
             <Box
               sx={{
-                width: 120,
-                height: 140,
+                width: 240,
+                height: 480,
                 borderRadius: 2,
                 bgcolor: "#0c0c0c",
                 border: "1px solid rgba(255,255,255,0.08)",
@@ -49,7 +49,7 @@ export default function FighterCompareCard({ fighter, title }: Props) {
                   sx={{ width: "100%", height: "100%", objectFit: "contain" }}
                 />
               ) : (
-                <Typography sx={{ opacity: 0.6, fontSize: 12 }}>No image</Typography>
+                <Typography sx={{ opacity: 0.6, fontSize: 22 }}>No image</Typography>
               )}
             </Box>
 

@@ -51,6 +51,9 @@ export default function TaleOfTheTape({
         borderRadius: 3,
         p: 2,
         color: "white",
+        width: "100%",
+        maxwidth: 1100,
+        mx: "auto",
       }}
     >
       <Typography variant="h6" sx={{ fontWeight: 900 }}>
