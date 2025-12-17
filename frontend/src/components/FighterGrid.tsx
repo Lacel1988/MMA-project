@@ -104,15 +104,17 @@ export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
                   sx={{
                     display: "block",
                     maxWidth: "100%",
-                    whiteSpace: "normal",
+                    minWidth: 0,
+                    whiteSpace: "nowrap",     // ← KULCS
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                     lineHeight: 1.2,
-                    wordBreak: "break-word",
                   }}
                 >
                   {f.division?.name ?? "No division"}
                 </Box>
               }
-              size="medium"
+              size="small"
               sx={{
                 mt: 1,
                 mb: 1,
@@ -122,14 +124,16 @@ export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
                 letterSpacing: 0.3,
                 alignSelf: "flex-start",
                 maxWidth: "100%",
+                minWidth: 0,
                 "& .MuiChip-label": {
-                  display: "block",
-                  whiteSpace: "normal",
+                  maxWidth: "100%",
+                  minWidth: 0,
                   paddingTop: "6px",
                   paddingBottom: "6px",
                 },
               }}
             />
+
 
             <Typography variant="body2" sx={{ mt: "auto" }}>
               Record: {f.wins}-{f.losses}-{f.draw}
