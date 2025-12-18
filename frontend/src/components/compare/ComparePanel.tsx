@@ -1,8 +1,17 @@
 import { Autocomplete, Box, TextField } from "@mui/material";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Fighter } from "../../types";
 import FighterCompareCard from "./FighterCompareCard";
 import TaleOfTheTape from "./TaleOfTheTape";
+import UfcRadarChart from "./UfcRadarChart";
+
+type Metrics = {
+  sig_str_acc_pct: number;
+  td_acc_pct: number;
+  kd_per15: number;
+  sub_att_per15: number;
+  ctrl_sec_per15: number;
+};
 
 type Props = {
   fighters: Fighter[];
@@ -21,7 +30,6 @@ const inputSx = {
     borderColor: "rgba(255,255,255,0.18)",
   },
 
-  /* X (clear) ikon */
   "& .MuiAutocomplete-clearIndicator": {
     color: "rgba(255,255,255,0.75)",
   },
@@ -29,7 +37,6 @@ const inputSx = {
     color: "#fff",
   },
 
-  /* lenyíló nyíl */
   "& .MuiAutocomplete-popupIndicator": {
     color: "rgba(255,255,255,0.75)",
   },
@@ -79,6 +86,43 @@ export default function ComparePanel({
     }
   }, [left, right, setRight]);
 
+  const [leftRadar, setLeftRadar] = useState<Metrics | null>(null);
+  const [rightRadar, setRightRadar] = useState<Metrics | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      if (!left) {
+        setLeftRadar(null);
+        return;
+      }
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
+          left.name
+        )}&last=5`
+      );
+      const data = await res.json();
+      setLeftRadar(data.metrics ?? null);
+    }
+    load();
+  }, [left]);
+
+  useEffect(() => {
+    async function load() {
+      if (!right) {
+        setRightRadar(null);
+        return;
+      }
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
+          right.name
+        )}&last=5`
+      );
+      const data = await res.json();
+      setRightRadar(data.metrics ?? null);
+    }
+    load();
+  }, [right]);
+
   return (
     <Box
       sx={{
@@ -90,11 +134,12 @@ export default function ComparePanel({
       <Box
         sx={{
           width: "100%",
-          maxWidth: 1100, // ← itt szabályozod a compare “színpad” szélességét
+          maxWidth: 1100,
           display: "grid",
           gap: 3,
         }}
       >
+        {/* SELECTORS */}
         <Box
           sx={{
             display: "grid",
@@ -119,9 +164,7 @@ export default function ComparePanel({
                 label="Fighter A"
                 variant="outlined"
                 sx={inputSx}
-                slotProps={{
-                  inputLabel: { sx: inputLabelSx },
-                }}
+                slotProps={{ inputLabel: { sx: inputLabelSx } }}
               />
             )}
           />
@@ -143,14 +186,13 @@ export default function ComparePanel({
                 label="Fighter B"
                 variant="outlined"
                 sx={inputSx}
-                slotProps={{
-                  inputLabel: { sx: inputLabelSx },
-                }}
+                slotProps={{ inputLabel: { sx: inputLabelSx } }}
               />
             )}
           />
         </Box>
 
+        {/* CARDS */}
         <Box
           sx={{
             display: "grid",
@@ -163,6 +205,33 @@ export default function ComparePanel({
           <FighterCompareCard fighter={right} title="Fighter B" />
         </Box>
 
+        {/* RADAR CHARTS */}
+        <Box
+          sx={{
+            display: "grid",
+            gap: 3,
+            gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+            "& > *": { minWidth: 0 },
+          }}
+        >
+          <UfcRadarChart
+            title="Fighter A"
+            fighterName={left?.name ?? "Fighter A"}
+            metrics={leftRadar}
+            last={5}
+            color="#b71c1c"
+          />
+
+          <UfcRadarChart
+            title="Fighter B"
+            fighterName={right?.name ?? "Fighter B"}
+            metrics={rightRadar}
+            last={5}
+            color="#1976d2"
+          />
+        </Box>
+
+        {/* TALE OF THE TAPE */}
         <TaleOfTheTape left={left} right={right} />
       </Box>
     </Box>

@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "fighters",
+    "ufcstats",
 ]
 
 REST_FRAMEWORK = {
