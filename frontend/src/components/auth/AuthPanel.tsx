@@ -1,10 +1,10 @@
 import { useState } from "react";
 import {Box,Paper,Typography,Tabs,Tab,TextField,Button,Alert,
 } from "@mui/material";
-import { login, registerUser, fetchMe } from "../../api/authApi";
+import { login, registerUser, fetchMe, type MeResponse } from "../../api/authApi";
 
 type Props = {
-  onLoginSuccess: (me: { username: string }) => void;
+  onLoginSuccess: (me: MeResponse) => void;
 };
 
 const inputSx = {
@@ -38,7 +38,7 @@ export default function AuthPanel({ onLoginSuccess }: Props) {
     try {
       await login(username.trim(), password);
       const me = await fetchMe();
-      onLoginSuccess({ username: me.username });
+      onLoginSuccess(me);
     } catch (e: any) {
       setHiba(e?.message || "Login failed.");
     }

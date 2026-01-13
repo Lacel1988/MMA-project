@@ -9,7 +9,7 @@ import AuthPanel from "./components/auth/AuthPanel";
 import AuthHero from "./components/auth/AuthHero";
 
 import type { Fighter } from "./types";
-import { fetchMe, logout } from "./api/authApi";
+import { fetchMe, logout, type MeResponse } from "./api/authApi";
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth";
 
@@ -24,7 +24,7 @@ export default function App() {
   const [kivalasztott, setKivalasztott] = useState<Fighter | null>(null);
   const [aktivFül, setAktivFül] = useState<Ful>("Auth");
 
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<MeResponse | null>(null);
 
   const [left, setLeft] = useState<Fighter | null>(null);
   const [right, setRight] = useState<Fighter | null>(null);
@@ -32,7 +32,7 @@ export default function App() {
   useEffect(() => {
     fetchMe()
       .then((me) => {
-        setUser({ username: me.username });
+        setUser(me);
         setAktivFül("Fighters");
       })
       .catch(() => {
@@ -82,7 +82,7 @@ export default function App() {
 
             <AuthPanel
               onLoginSuccess={(me) => {
-                setUser({ username: me.username });
+                setUser(me);
                 setAktivFül("Fighters");
               }}
             />

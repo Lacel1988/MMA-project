@@ -1,4 +1,5 @@
 import { AppBar, Toolbar, Typography, Button, Box, Chip, Container } from "@mui/material";
+import type { MeResponse } from "../api/authApi";
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth";
 
@@ -11,7 +12,7 @@ export default function Navbar({
 }: {
   aktivFül: Ful;
   setAktivFül: (f: Ful) => void;
-  user: { username: string } | null;
+  user: MeResponse | null;
   onLogout: () => void;
   height?: number;
 }) {
