@@ -10,6 +10,7 @@ import AuthHero from "./components/auth/AuthHero";
 
 import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
+import { getAccessToken } from "./api/client";
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth";
 
@@ -25,6 +26,9 @@ export default function App() {
   const [aktivFül, setAktivFül] = useState<Ful>("Auth");
 
   const [user, setUser] = useState<MeResponse | null>(null);
+
+  // IMPORTANT: isAdmin csak a user után!
+  const isAdmin = !!user?.is_staff || !!user?.is_superuser;
 
   const [left, setLeft] = useState<Fighter | null>(null);
   const [right, setRight] = useState<Fighter | null>(null);
@@ -119,14 +123,39 @@ export default function App() {
               pt: { lg: 8 },
             }}
           >
-            <FighterDetails fighter={kivalasztott} mode="preview" />
+            {/* ITT VOLT A CSERE: FighterDetails preview + isAdmin + onUpdated */}
+            <FighterDetails
+              fighter={kivalasztott}
+              mode="preview"
+              isAdmin={isAdmin}
+              onUpdated={(patch) => {
+                // kiválasztott frissítése
+                setKivalasztott((prev) => (prev ? { ...prev, ...patch } : prev));
+
+                // listában is frissítjük
+                setFighters((prev) =>
+                  prev.map((f) => (f.id === kivalasztott?.id ? { ...f, ...patch } : f))
+                );
+              }}
+            />
           </Box>
         </Box>
       )}
 
       {/* DETAILS */}
       {aktivFül === "Details" && (
-        <FighterDetails fighter={kivalasztott} mode="full" />
+        // ITT VOLT A CSERE: FighterDetails full + isAdmin + onUpdated
+        <FighterDetails
+          fighter={kivalasztott}
+          mode="full"
+          isAdmin={isAdmin}
+          onUpdated={(patch) => {
+            setKivalasztott((prev) => (prev ? { ...prev, ...patch } : prev));
+            setFighters((prev) =>
+              prev.map((f) => (f.id === kivalasztott?.id ? { ...f, ...patch } : f))
+            );
+          }}
+        />
       )}
 
       {/* COMPARE */}
@@ -161,17 +190,9 @@ export default function App() {
           bgcolor: "#0b0b0b",
         }}
       >
-        {/* Compare alatt nem Container: saját stage */}
         {aktivFül === "Compare" ? (
           <Box sx={{ py: 3, px: { xs: 2, sm: 3, md: 4 } }}>
-            <Box
-              sx={{
-                maxWidth: 1100,
-                mx: "auto",
-              }}
-            >
-              {tartalom}
-            </Box>
+            <Box sx={{ maxWidth: 1100, mx: "auto" }}>{tartalom}</Box>
           </Box>
         ) : (
           <Container maxWidth="xl" sx={{ py: 3 }}>

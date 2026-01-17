@@ -1,21 +1,36 @@
-let accessToken: string | null = localStorage.getItem("accessToken");
+const ACCESS_KEY = "access_token";
 
-export function setToken(token: string | null) {
-  accessToken = token;
-  if (token) localStorage.setItem("accessToken", token);
-  else localStorage.removeItem("accessToken");
+export function setAccessToken(token: string) {
+  localStorage.setItem(ACCESS_KEY, token);
 }
 
-export function getToken() {
-  return accessToken;
+export function getAccessToken(): string | null {
+  return localStorage.getItem(ACCESS_KEY);
 }
 
-export async function apiFetch(input: RequestInfo, init: RequestInit = {}) {
-  const headers = new Headers(init.headers || {});
-  headers.set("Content-Type", "application/json");
+export function clearAccessToken() {
+  localStorage.removeItem(ACCESS_KEY);
+}
 
-  const token = getToken();
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+export async function apiFetch(url: string, options: RequestInit = {}) {
+  const token = getAccessToken();
 
-  return fetch(input, { ...init, headers });
+  // fejlécek összeolvasztása (NE veszítsük el a hívó headerét)
+  const headers = new Headers(options.headers || {});
+
+  // ha van token, tegyük rá
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  // ha a hívó nem adott Content-Type-ot, és van body -> JSON
+  const hasBody = options.body !== undefined && options.body !== null;
+  if (hasBody && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  return fetch(url, {
+    ...options,
+    headers,
+  });
 }

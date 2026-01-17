@@ -1,7 +1,16 @@
 import { useState } from "react";
-import {Box,Paper,Typography,Tabs,Tab,TextField,Button,Alert,
+import {
+  Box,
+  Paper,
+  Typography,
+  Tabs,
+  Tab,
+  TextField,
+  Button,
+  Alert,
 } from "@mui/material";
-import { login, registerUser, fetchMe, type MeResponse } from "../../api/authApi";
+
+import { login, registerUser, type MeResponse } from "../../api/authApi";
 
 type Props = {
   onLoginSuccess: (me: MeResponse) => void;
@@ -36,8 +45,7 @@ export default function AuthPanel({ onLoginSuccess }: Props) {
     setOk("");
 
     try {
-      await login(username.trim(), password);
-      const me = await fetchMe();
+      const me = await login(username.trim(), password);
       onLoginSuccess(me);
     } catch (e: any) {
       setHiba(e?.message || "Login failed.");
@@ -54,9 +62,11 @@ export default function AuthPanel({ onLoginSuccess }: Props) {
     if (password !== password2) return setHiba("Passwords do not match.");
 
     try {
-      await registerUser(username.trim(), email.trim(), password);
+      await registerUser(username.trim(), email.trim(), password, password2);
       setOk("Registration successful. You can login now.");
       setTab("login");
+      setPassword("");
+      setPassword2("");
     } catch (e: any) {
       setHiba(e?.message || "Registration failed.");
     }
@@ -114,6 +124,7 @@ export default function AuthPanel({ onLoginSuccess }: Props) {
             InputLabelProps={labelSx}
             sx={inputSx}
           />
+
           <TextField
             label="Password"
             type="password"
@@ -145,6 +156,7 @@ export default function AuthPanel({ onLoginSuccess }: Props) {
             InputLabelProps={labelSx}
             sx={inputSx}
           />
+
           <TextField
             label="Email"
             value={email}
@@ -152,6 +164,7 @@ export default function AuthPanel({ onLoginSuccess }: Props) {
             InputLabelProps={labelSx}
             sx={inputSx}
           />
+
           <TextField
             label="Password"
             type="password"
@@ -160,6 +173,7 @@ export default function AuthPanel({ onLoginSuccess }: Props) {
             InputLabelProps={labelSx}
             sx={inputSx}
           />
+
           <TextField
             label="Password again"
             type="password"
