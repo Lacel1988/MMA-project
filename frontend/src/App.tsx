@@ -10,7 +10,7 @@ import AuthHero from "./components/auth/AuthHero";
 
 import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
-import { getAccessToken } from "./api/client";
+
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth";
 
@@ -129,13 +129,19 @@ export default function App() {
               mode="preview"
               isAdmin={isAdmin}
               onUpdated={(patch) => {
+                const id = kivalasztott?.id;
+
                 // kiválasztott frissítése
                 setKivalasztott((prev) => (prev ? { ...prev, ...patch } : prev));
 
-                // listában is frissítjük
-                setFighters((prev) =>
-                  prev.map((f) => (f.id === kivalasztott?.id ? { ...f, ...patch } : f))
-                );
+                // listában frissítés
+                if (id != null) {
+                  setFighters((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+                }
+
+                // compare panelek frissítése, ha épp azt a harcost hasonlítod
+                setLeft((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
+                setRight((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
               }}
             />
           </Box>
