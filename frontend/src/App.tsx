@@ -12,7 +12,7 @@ import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
 
 
-type Ful = "Fighters" | "Details" | "Compare" | "Auth";
+type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
 const API_URL = "http://127.0.0.1:8000/api";
 
@@ -34,15 +34,16 @@ export default function App() {
   const [right, setRight] = useState<Fighter | null>(null);
 
   useEffect(() => {
-    fetchMe()
-      .then((me) => {
-        setUser(me);
-        setAktivFül("Fighters");
-      })
-      .catch(() => {
-        setUser(null);
-        setAktivFül("Auth");
-      });
+    const token = localStorage.getItem("access_token"); if (!token) { setUser(null); setAktivFül("Auth"); return; }
+    
+    fetchMe().then((me) => {
+      setUser(me);
+      setAktivFül("Fighters");
+    }).catch(() => {
+      logout();
+      setUser(null);
+      setAktivFül("Auth");
+    });
   }, []);
 
   useEffect(() => {
@@ -173,6 +174,10 @@ export default function App() {
           setLeft={setLeft}
           setRight={setRight}
         />
+      )}
+      {aktivFül === "Forum" && (
+        <Typography sx={{ color: "white" }}>Forum coming soon...</Typography>
+
       )}
     </>
   );

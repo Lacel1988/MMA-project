@@ -1,7 +1,7 @@
 import { AppBar, Toolbar, Typography, Button, Box, Chip, Container } from "@mui/material";
 import type { MeResponse } from "../api/authApi";
 
-type Ful = "Fighters" | "Details" | "Compare" | "Auth";
+type Ful = "Fighters" | "Details" | "Compare" | "Auth"  | "Forum";
 
 export default function Navbar({
   aktivFül,
@@ -94,7 +94,9 @@ export default function Navbar({
             {gomb("Fighters")}
             {gomb("Details")}
             {gomb("Compare")}
+            {gomb("Forum")}
             {gomb("Auth")}
+
           </Box>
         </Container>
       </Toolbar>
