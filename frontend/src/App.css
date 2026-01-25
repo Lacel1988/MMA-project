@@ -1,4 +1,4 @@
-/* App.css – MUI layout mellett ne korlátozd a rootot */
+/* App.css - MUI layout mellett ne korlátozd a rootot */
 
 #root {
   width: 100%;
@@ -8,7 +8,7 @@
   text-align: initial;
 }
 
-
+/* Vite maradékok (ha zavar, később takarítható, most marad) */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -25,12 +25,8 @@
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -39,10 +35,48 @@
   }
 }
 
-.card {
-  padding: 2em;
+.card { padding: 2em; }
+.read-the-docs { color: #888; }
+
+/* MMA/UFC font tokenek */
+:root {
+  --mma-title-font: "Oswald", "Impact", "Haettenschweiler", "Arial Narrow", "Segoe UI", Arial, sans-serif;
+  --mma-body-font: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-.read-the-docs {
-  color: #888;
+/* Flash effekt (marad) */
+@keyframes mmaFlashOnce {
+  0% { opacity: 0; }
+  12% { opacity: 0.20; }
+  35% { opacity: 0.05; }
+  100% { opacity: 0; }
+}
+
+.mma-flash-once {
+  animation: mmaFlashOnce 900ms ease 1;
+}
+
+/* Timeline csik "betoltes" */
+@keyframes lineGrow {
+  from { transform: translateX(-50%) scaleY(0); }
+  to { transform: translateX(-50%) scaleY(1); }
+}
+
+.mma-timeline-line {
+  transform-origin: top;
+  animation: lineGrow 15000ms ease-in-out 1;
+  animation-fill-mode: both;
+  animation-delay: 200ms;
+}
+
+/* Dotok felpattannak a csik utan */
+@keyframes dotPop {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.55); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.mma-timeline-dot {
+  animation: dotPop 520ms ease-out 1;
+  animation-fill-mode: both;
+  animation-delay: var(--dot-delay, 1400ms);
 }

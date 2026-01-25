@@ -11,7 +11,6 @@ import AuthHero from "./components/auth/AuthHero";
 import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
 
-
 type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
 const API_URL = "http://127.0.0.1:8000/api";
@@ -27,23 +26,29 @@ export default function App() {
 
   const [user, setUser] = useState<MeResponse | null>(null);
 
-  // IMPORTANT: isAdmin csak a user után!
   const isAdmin = !!user?.is_staff || !!user?.is_superuser;
 
   const [left, setLeft] = useState<Fighter | null>(null);
   const [right, setRight] = useState<Fighter | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token"); if (!token) { setUser(null); setAktivFül("Auth"); return; }
-    
-    fetchMe().then((me) => {
-      setUser(me);
-      setAktivFül("Fighters");
-    }).catch(() => {
-      logout();
+    const token = localStorage.getItem("access_token");
+    if (!token) {
       setUser(null);
       setAktivFül("Auth");
-    });
+      return;
+    }
+
+    fetchMe()
+      .then((me) => {
+        setUser(me);
+        setAktivFül("Fighters");
+      })
+      .catch(() => {
+        logout();
+        setUser(null);
+        setAktivFül("Auth");
+      });
   }, []);
 
   useEffect(() => {
@@ -124,7 +129,6 @@ export default function App() {
               pt: { lg: 8 },
             }}
           >
-            {/* ITT VOLT A CSERE: FighterDetails preview + isAdmin + onUpdated */}
             <FighterDetails
               fighter={kivalasztott}
               mode="preview"
@@ -132,15 +136,12 @@ export default function App() {
               onUpdated={(patch) => {
                 const id = kivalasztott?.id;
 
-                // kiválasztott frissítése
                 setKivalasztott((prev) => (prev ? { ...prev, ...patch } : prev));
 
-                // listában frissítés
                 if (id != null) {
                   setFighters((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
                 }
 
-                // compare panelek frissítése, ha épp azt a harcost hasonlítod
                 setLeft((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
                 setRight((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
               }}
@@ -151,7 +152,6 @@ export default function App() {
 
       {/* DETAILS */}
       {aktivFül === "Details" && (
-        // ITT VOLT A CSERE: FighterDetails full + isAdmin + onUpdated
         <FighterDetails
           fighter={kivalasztott}
           mode="full"
@@ -175,9 +175,10 @@ export default function App() {
           setRight={setRight}
         />
       )}
+
+      {/* FORUM */}
       {aktivFül === "Forum" && (
         <Typography sx={{ color: "white" }}>Forum coming soon...</Typography>
-
       )}
     </>
   );
