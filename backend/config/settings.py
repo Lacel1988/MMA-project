@@ -1,9 +1,9 @@
 from pathlib import Path
 from datetime import timedelta
+from .secret import SECRET_KEY
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-change-me"
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
