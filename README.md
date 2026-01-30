@@ -31,7 +31,7 @@ as it may contain local data such as users, permissions and test records.
 
 After cloning the repository, initialize the database by running the following commands:
 
-```bash
+```cmd
 python manage.py migrate
 python manage.py createsuperuser
 ```
