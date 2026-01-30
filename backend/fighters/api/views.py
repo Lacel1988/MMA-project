@@ -9,14 +9,28 @@ from .serializers import DivisionSerializer, FighterSerializer
 User = get_user_model()
 
 
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Read (GET/HEAD/OPTIONS) -> everyone
+    Write (POST/PATCH/PUT/DELETE) -> authenticated staff only
+    """
+
+    def has_permission(self, request, view):
+        if request.method in ("GET", "HEAD", "OPTIONS"):
+            return True
+        return bool(request.user and request.user.is_authenticated and request.user.is_staff)
+
+
 class FighterViewSet(viewsets.ModelViewSet):
     queryset = Fighter.objects.all()
     serializer_class = FighterSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class DivisionViewSet(viewsets.ModelViewSet):
     queryset = Division.objects.all()
     serializer_class = DivisionSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class RegisterView(APIView):
@@ -40,7 +54,10 @@ class RegisterView(APIView):
             )
 
         user = User.objects.create_user(username=username, email=email, password=password)
-        return Response({"id": user.id, "username": user.username, "email": user.email}, status=201)
+        return Response(
+            {"id": user.id, "username": user.username, "email": user.email},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class MeView(APIView):
