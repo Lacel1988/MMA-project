@@ -27,39 +27,34 @@ def _parse_of(s: str):
     parts = s.split("of")
     if len(parts) != 2:
         return (0, 0)
-    a = parts[0].strip()
-    b = parts[1].strip()
     try:
-        return (int(a), int(b))
-    except:
+        return (int(parts[0].strip()), int(parts[1].strip()))
+    except ValueError:
         return (0, 0)
 
 
 def _parse_time_mmss(s: str):
     s = (s or "").strip()
-    if not s or s == "---":
+    if not s or s == "---" or ":" not in s:
         return 0
-    if ":" not in s:
-        return 0
-    mm, ss = s.split(":", 1)
     try:
+        mm, ss = s.split(":", 1)
         return int(mm) * 60 + int(ss)
-    except:
+    except ValueError:
         return 0
 
 
 def _fight_duration_seconds(finish_round: int, finish_time_mmss: str):
-    t = _parse_time_mmss(finish_time_mmss)
-    r = int(finish_round) if finish_round else 0
-    if r <= 0:
+    if finish_round <= 0:
         return 0
-    return (r - 1) * 300 + t
+    return (finish_round - 1) * 300 + _parse_time_mmss(finish_time_mmss)
 
 
 @lru_cache(maxsize=1)
 def _event_dates_map():
     if not EVENTS_CSV.exists():
         return {}
+
     out = {}
     with EVENTS_CSV.open(newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
@@ -70,7 +65,7 @@ def _event_dates_map():
                 continue
             try:
                 out[ev] = _parse_event_date(ds)
-            except:
+            except ValueError:
                 continue
     return out
 
@@ -79,6 +74,7 @@ def _event_dates_map():
 def _fight_results_map():
     if not RESULTS_CSV.exists():
         return {}
+
     out = {}
     with RESULTS_CSV.open(newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
@@ -116,8 +112,8 @@ def _fighter_last_fights_keys(fighter_name: str, last_n: int):
         return []
 
     event_dates = _event_dates_map()
-
     fights_set = set()
+
     with STATS_CSV.open(newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
         for row in r:
@@ -129,7 +125,16 @@ def _fighter_last_fights_keys(fighter_name: str, last_n: int):
                 fights_set.add((ev, bout))
 
     fights = list(fights_set)
-    fights.sort(key=lambda k: event_dates.get(k[0], datetime(1900, 1, 1).date()), reverse=True)
+
+    # 🔧 FIX: determinisztikus rendezés (nem flaky többé)
+    fights.sort(
+        key=lambda k: (
+            event_dates.get(k[0], datetime(1900, 1, 1).date()),
+            k[0],  # tie-breaker
+        ),
+        reverse=True,
+    )
+
     return fights[: max(0, int(last_n))]
 
 
@@ -138,21 +143,18 @@ def _aggregate_for_fighter(fighter_name: str, last_n: int):
     if not keys:
         return None
 
-    wanted = set(keys)
     results = _fight_results_map()
-
     agg = Agg(fights=len(keys))
 
-    for (ev, bout) in keys:
+    for ev, bout in keys:
         res = results.get((ev, bout))
         if not res:
             continue
         try:
-            r = int(res.get("round") or "0")
-        except:
+            r = int(res.get("round") or 0)
+        except ValueError:
             r = 0
-        t = res.get("time") or ""
-        agg.dur_sec += _fight_duration_seconds(r, t)
+        agg.dur_sec += _fight_duration_seconds(r, res.get("time") or "")
 
     with STATS_CSV.open(newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
@@ -161,11 +163,11 @@ def _aggregate_for_fighter(fighter_name: str, last_n: int):
                 continue
             ev = (row.get("EVENT") or "").strip()
             bout = (row.get("BOUT") or "").strip()
-            if (ev, bout) not in wanted:
+            if (ev, bout) not in set(keys):
                 continue
 
-            agg.kd += int(float(row.get("KD") or 0) or 0)
-            agg.sub_att += int(float(row.get("SUB.ATT") or 0) or 0)
+            agg.kd += int(float(row.get("KD") or 0))
+            agg.sub_att += int(float(row.get("SUB.ATT") or 0))
 
             sig_l, sig_a = _parse_of(row.get("SIG.STR.") or "")
             agg.sig_landed += sig_l
@@ -189,8 +191,7 @@ def _pct(landed: int, att: int):
 def _per15(count: int, dur_sec: int):
     if dur_sec <= 0:
         return 0.0
-    mins = dur_sec / 60.0
-    return (count / mins) * 15.0
+    return (count / (dur_sec / 60.0)) * 15.0
 
 
 @api_view(["GET"])
@@ -201,15 +202,12 @@ def ufc_radar(request):
     if not fighter:
         return Response({"error": "Missing ?fighter="}, status=400)
 
-    if not STATS_CSV.exists() or not RESULTS_CSV.exists() or not EVENTS_CSV.exists():
-        return Response(
-            {"error": "Missing CSV files under data/ufcstats (event_details, fight_results, fight_stats)."},
-            status=500,
-        )
+    if not EVENTS_CSV.exists() or not RESULTS_CSV.exists() or not STATS_CSV.exists():
+        return Response({"error": "Missing CSV files."}, status=500)
 
     agg = _aggregate_for_fighter(fighter, last_n)
     if not agg:
-        return Response({"error": f"No fights found in stats CSV for fighter '{fighter}'."}, status=404)
+        return Response({"error": f"No fights found for fighter '{fighter}'."}, status=404)
 
     return Response({
         "fighter": fighter,

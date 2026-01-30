@@ -17,7 +17,7 @@ class UFCFight(models.Model):
     outcome = models.CharField(max_length=50, blank=True)
     weightclass = models.CharField(max_length=50, blank=True)
     method = models.CharField(max_length=120, blank=True)
-    round = models.PositiveSmallIntegerField(blank=True)
+    round = models.PositiveSmallIntegerField(null=True,  blank=True)
     time = models.CharField(max_length=20, blank=True, null=True)
     time_format = models.CharField(max_length=20, blank=True)
     referee = models.CharField(max_length=60, blank=True)

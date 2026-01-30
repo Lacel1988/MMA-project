@@ -17,14 +17,14 @@ class Fighter(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    age = models.IntegerField()
+    age = models.PositiveIntegerField(100)
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     height = models.DecimalField(max_digits=5, decimal_places=2)
     reach = models.PositiveSmallIntegerField(null=True, blank=True)
 
-    wins = models.IntegerField(default=0)
-    losses = models.IntegerField(default=0)
-    draw = models.IntegerField(default=0)
+    wins = models.PositiveIntegerField(default=0)
+    losses = models.PositiveIntegerField(default=0)
+    draw = models.PositiveIntegerField(default=0)
 
     nickname = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)

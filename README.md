@@ -37,3 +37,7 @@ python manage.py createsuperuser
 ```
 
 These commands will create the database structure and allow you to create an admin user.
+
+### TESTING
+Testing instructions can be found in TESTING.md.
+
