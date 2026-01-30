@@ -105,7 +105,7 @@ export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
                     display: "block",
                     maxWidth: "100%",
                     minWidth: 0,
-                    whiteSpace: "nowrap",     // ← KULCS
+                    whiteSpace: "nowrap",     
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     lineHeight: 1.2,

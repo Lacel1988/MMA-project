@@ -113,8 +113,12 @@ export default function UfcRadarChart({
         {fighterName} | last {last} fights
       </Typography>
 
-      <Box sx={{ width: "100%", minWidth: 0 }}>
-        <ResponsiveContainer width="100%" aspect={ 1.2 }>
+      <Box sx={{ 
+        width: "100%",
+        minWidth: 0, 
+        height: {xs: 280, sm: 320, md: 360},
+        }}>
+        <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={data}>
             <PolarGrid stroke="rgba(255,255,255,0.18)" />
             <PolarAngleAxis

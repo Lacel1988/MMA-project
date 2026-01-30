@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 from .secret import SECRET_KEY
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = True
