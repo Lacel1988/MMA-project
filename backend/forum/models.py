@@ -7,7 +7,7 @@ class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True, null=True)
 
-    def str(self):
+    def __str__(self):
         return self.name
 
 
@@ -18,7 +18,7 @@ class Topic(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="created_topics")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return self.title
 
 
@@ -28,7 +28,7 @@ class Post(models.Model):
     content = models.TextField()
     posted_at = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return f"Post #{self.id} in {self.topic.title}"
 
 
@@ -38,7 +38,7 @@ class Reply(models.Model):
     content = models.TextField()
     replied_at = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return f"Reply #{self.id} to Post #{self.post.id}"
 
 
@@ -50,5 +50,5 @@ class PostLike(models.Model):
     class Meta:
         unique_together = ("post", "user")
 
-    def str(self):
+    def __str__(self):
         return f"{self.user} liked Post #{self.post.id}"
