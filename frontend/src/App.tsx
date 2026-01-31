@@ -10,6 +10,7 @@ import AuthHero from "./components/auth/AuthHero";
 
 import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
+import CategoriesPage from "./components/MmaForum";
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
@@ -178,7 +179,9 @@ export default function App() {
 
       {/* FORUM */}
       {aktivFül === "Forum" && (
-        <Typography sx={{ color: "white" }}>Forum coming soon...</Typography>
+        <CategoriesPage />
+
+
       )}
     </>
   );
