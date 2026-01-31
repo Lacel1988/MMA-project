@@ -38,6 +38,8 @@ class Fighter(models.Model):
 
     nickname = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
+    
+    ufcstats_url = models.URLField(blank = True, null = True)
 
     upload_image = models.ImageField(
         upload_to="fighters/images/",
