@@ -113,7 +113,7 @@ const CategoriesPage: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Biztosan törlöd ezt a kategóriát?")) return;
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
     try {
       const res = await fetch(`${API_BASE}${id}/`, {
         method: "DELETE",
@@ -133,21 +133,21 @@ const CategoriesPage: React.FC = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Categories</Typography>
         <Button variant="contained" color="primary" onClick={handleOpenCreate}>
-          Új kategória
+          New category
         </Button>
       </Stack>
 
       {loading ? (
-        <Typography>Betöltés...</Typography>
+        <Typography>Loading...</Typography>
       ) : (
         <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
-                <TableCell>Név</TableCell>
-                <TableCell>Leírás</TableCell>
-                <TableCell align="right">Műveletek</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -173,7 +173,7 @@ const CategoriesPage: React.FC = () => {
               {categories.length === 0 && !loading && (
                 <TableRow>
                   <TableCell colSpan={4}>
-                    <Typography align="center">Nincs még kategória.</Typography>
+                    <Typography align="center">No categories yet.</Typography>
                   </TableCell>
                 </TableRow>
               )}
@@ -184,19 +184,19 @@ const CategoriesPage: React.FC = () => {
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
         <DialogTitle>
-          {form.id ? "Kategória szerkesztése" : "Új kategória létrehozása"}
+          {form.id ? "Edit category" : "Create new category"}
         </DialogTitle>
         <DialogContent>
           <Box mt={1} display="flex" flexDirection="column" gap={2}>
             <TextField
-              label="Név"
+              label="Name"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
               fullWidth
               required
             />
             <TextField
-              label="Leírás"
+              label="Description"
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}
               fullWidth
@@ -206,13 +206,13 @@ const CategoriesPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Mégse</Button>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button
             onClick={handleSave}
             variant="contained"
             disabled={saving || !form.name.trim()}
           >
-            Mentés
+            Save
           </Button>
         </DialogActions>
       </Dialog>
