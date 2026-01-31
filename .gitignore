@@ -10,4 +10,8 @@ pyvenv.cfg
 backend/db.sqlite3
 backend/config/secret.py
 __pycache__/
+config/__pycache__/
+fighters/__pycache__/
+ufcstats/__pycache__/
+forum/__pycache__/
 *.pyc
