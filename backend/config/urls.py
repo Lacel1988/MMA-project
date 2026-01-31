@@ -7,6 +7,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("fighters.api.urls")),
     path("api/", include("ufcstats.api.urls")),
+    path("api/", include("forum.urls")),
+
 
 ]
 
