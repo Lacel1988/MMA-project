@@ -59,11 +59,12 @@ type Category = {
 // ----------------------
 // API endpoints
 // ----------------------
-const API_CATEGORIES = "/api/categories/";
-const API_TOPICS = "/api/topics/";
-const API_POSTS = "/api/posts/";
-const API_REPLIES = "/api/replies/";
-const API_LIKES = "/api/likes/";
+const API_BASE = "http://127.0.0.1:8000";
+const API_CATEGORIES = API_BASE+"/api/categories/";
+const API_TOPICS = API_BASE+"/api/topics/";
+const API_POSTS = API_BASE+"/api/posts/";
+const API_REPLIES = API_BASE+"/api/replies/";
+const API_LIKES = API_BASE+"/api/likes/";
 
 // ----------------------
 // Main Component
