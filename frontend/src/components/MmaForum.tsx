@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, IconButton, Stack, Button } from "@mui/material";
 
-// Kompatibilis importok (ha a barrel import nálatok hibázna, ezt használd):
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 
 import {
-  ExpandMore,
-  ChevronRight,
   Edit,
   Delete,
   Add,
   Favorite,
 } from "@mui/icons-material";
 
-import CategoryDialog, { CategoryForm } from "./dialogs/CategoryDialog";
-import TopicDialog, { TopicForm } from "./dialogs/TopicDialog";
-import PostDialog, { PostForm } from "./dialogs/PostDialog";
-import ReplyDialog, { ReplyForm } from "./dialogs/ReplyDialog";
-import PostLikeDialog, { PostLikeForm } from "./dialogs/PostLikeDialog";
+import CategoryDialog, { type CategoryForm } from "./dialogs/CategoryDialog";
+import TopicDialog, { type TopicForm } from "./dialogs/TopicDialog";
+import PostDialog, { type PostForm } from "./dialogs/PostDialog";
+import ReplyDialog, { type ReplyForm } from "./dialogs/ReplyDialog";
+import PostLikeDialog, { type PostLikeForm } from "./dialogs/PostLikeDialog";
 
 // ----------------------
 // Types (API shape)
@@ -413,10 +410,7 @@ const NestedForumPage: React.FC = () => {
       {loading ? (
         <Typography>Loading...</Typography>
       ) : (
-        <SimpleTreeView
-          defaultCollapseIcon={<ExpandMore />}
-          defaultExpandIcon={<ChevronRight />}
-        >
+        <SimpleTreeView>
           {renderCategories()}
         </SimpleTreeView>
       )}
