@@ -374,7 +374,7 @@ const NestedForumPage: React.FC = () => {
       {loading ? (
         <Typography>Loading...</Typography>
       ) : (
-        <SimpleTreeView
+        <SimpleTreeView>
           defaultCollapseIcon={<ExpandMore />}
           defaultExpandIcon={<ChevronRight />}
         >
