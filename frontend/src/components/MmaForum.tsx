@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Stack,
-  Button,
-} from "@mui/material";
+import { Box, Typography, IconButton, Stack, Button } from "@mui/material";
 
-import { RichTreeView, TreeItem } from "@mui/x-tree-view";
+// Kompatibilis importok (ha a barrel import nálatok hibázna, ezt használd):
+import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
+import { TreeItem } from "@mui/x-tree-view/TreeItem";
 
 import {
   ExpandMore,
@@ -18,17 +14,14 @@ import {
   Favorite,
 } from "@mui/icons-material";
 
-
-
 import CategoryDialog, { CategoryForm } from "./dialogs/CategoryDialog";
 import TopicDialog, { TopicForm } from "./dialogs/TopicDialog";
 import PostDialog, { PostForm } from "./dialogs/PostDialog";
 import ReplyDialog, { ReplyForm } from "./dialogs/ReplyDialog";
 import PostLikeDialog, { PostLikeForm } from "./dialogs/PostLikeDialog";
 
-
 // ----------------------
-// Types
+// Types (API shape)
 // ----------------------
 type Reply = {
   id: number;
@@ -66,7 +59,6 @@ type Category = {
   topics: Topic[];
 };
 
-
 // ----------------------
 // API endpoints
 // ----------------------
@@ -75,7 +67,6 @@ const API_TOPICS = "/api/topics/";
 const API_POSTS = "/api/posts/";
 const API_REPLIES = "/api/replies/";
 const API_LIKES = "/api/likes/";
-
 
 // ----------------------
 // Main Component
@@ -92,54 +83,94 @@ const NestedForumPage: React.FC = () => {
   const [likeDialog, setLikeDialog] = useState(false);
 
   // Form states
-  const [categoryForm, setCategoryForm] = useState<CategoryForm>({ name: "", description: "" });
-  const [topicForm, setTopicForm] = useState<TopicForm>({ title: "", description: "", category_id: "" });
-  const [postForm, setPostForm] = useState<PostForm>({ topic: "", content: "" });
-  const [replyForm, setReplyForm] = useState<ReplyForm>({ post: "", content: "" });
-  const [likeForm, setLikeForm] = useState<PostLikeForm>({ post: "" });
+  const [categoryForm, setCategoryForm] = useState<CategoryForm>({
+    name: "",
+    description: "",
+  });
+
+  const [topicForm, setTopicForm] = useState<TopicForm>({
+    title: "",
+    description: "",
+    category_id: "",
+  });
+
+  const [postForm, setPostForm] = useState<PostForm>({
+    topic: "",
+    content: "",
+  });
+
+  const [replyForm, setReplyForm] = useState<ReplyForm>({
+    post: "",
+    content: "",
+  });
+
+  const [likeForm, setLikeForm] = useState<PostLikeForm>({
+    post: "",
+  });
 
   const [saving, setSaving] = useState(false);
 
+  // ----------------------
+  // Helpers
+  // ----------------------
+  const safeJson = async (res: Response) => {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
 
-  // ----------------------
-  // Load full nested tree
-  // ----------------------
   const loadData = async () => {
     setLoading(true);
-    const res = await fetch(API_CATEGORIES);
-    const json = await res.json();
-    setData(json);
-    setLoading(false);
+    try {
+      const res = await fetch(API_CATEGORIES);
+      if (!res.ok) {
+        console.error("Failed to load categories", res.status);
+        setData([]);
+        return;
+      }
+      const json = await safeJson(res);
+      setData(Array.isArray(json) ? (json as Category[]) : []);
+    } catch (err) {
+      console.error("Load error:", err);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
-
-  // ----------------------
-  // Delete helpers
-  // ----------------------
   const deleteItem = async (url: string) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
-    await fetch(url, { method: "DELETE" });
-    loadData();
-  };
 
+    try {
+      const res = await fetch(url, { method: "DELETE" });
+      if (!res.ok) console.error("Delete failed", res.status);
+    } catch (err) {
+      console.error("Delete error:", err);
+    } finally {
+      loadData();
+    }
+  };
 
   // ----------------------
   // Render helpers
   // ----------------------
   const renderReplies = (post: Post) =>
-    post.replies.map((reply) => (
+    (post.replies ?? []).map((reply) => (
       <TreeItem
         key={`reply-${reply.id}`}
-        nodeId={`reply-${reply.id}`}
+        itemId={`reply-${reply.id}`}
         label={
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography>
               💬 {reply.author_username}: {reply.content}
             </Typography>
+
             <IconButton
               size="small"
               onClick={() => {
@@ -153,6 +184,7 @@ const NestedForumPage: React.FC = () => {
             >
               <Edit fontSize="small" />
             </IconButton>
+
             <IconButton
               size="small"
               color="error"
@@ -165,15 +197,15 @@ const NestedForumPage: React.FC = () => {
       />
     ));
 
-
   const renderLikes = (post: Post) =>
-    post.likes.map((like) => (
+    (post.likes ?? []).map((like) => (
       <TreeItem
         key={`like-${like.id}`}
-        nodeId={`like-${like.id}`}
+        itemId={`like-${like.id}`}
         label={
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography>❤️ {like.user_username}</Typography>
+
             <IconButton
               size="small"
               color="error"
@@ -186,12 +218,11 @@ const NestedForumPage: React.FC = () => {
       />
     ));
 
-
   const renderPosts = (topic: Topic) =>
-    topic.posts.map((post) => (
+    (topic.posts ?? []).map((post) => (
       <TreeItem
         key={`post-${post.id}`}
-        nodeId={`post-${post.id}`}
+        itemId={`post-${post.id}`}
         label={
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography>
@@ -242,22 +273,21 @@ const NestedForumPage: React.FC = () => {
           </Stack>
         }
       >
-        <TreeItem nodeId={`post-${post.id}-replies`} label="Replies">
+        <TreeItem itemId={`post-${post.id}-replies`} label="Replies">
           {renderReplies(post)}
         </TreeItem>
 
-        <TreeItem nodeId={`post-${post.id}-likes`} label="Likes">
+        <TreeItem itemId={`post-${post.id}-likes`} label="Likes">
           {renderLikes(post)}
         </TreeItem>
       </TreeItem>
     ));
 
-
   const renderTopics = (category: Category) =>
-    category.topics.map((topic) => (
+    (category.topics ?? []).map((topic) => (
       <TreeItem
         key={`topic-${topic.id}`}
-        nodeId={`topic-${topic.id}`}
+        itemId={`topic-${topic.id}`}
         label={
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography>📌 {topic.title}</Typography>
@@ -301,12 +331,11 @@ const NestedForumPage: React.FC = () => {
       </TreeItem>
     ));
 
-
   const renderCategories = () =>
     data.map((cat) => (
       <TreeItem
         key={`cat-${cat.id}`}
-        nodeId={`cat-${cat.id}`}
+        itemId={`cat-${cat.id}`}
         label={
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="h6">📁 {cat.name}</Typography>
@@ -349,6 +378,18 @@ const NestedForumPage: React.FC = () => {
       </TreeItem>
     ));
 
+  // ----------------------
+  // Dialog data lists
+  // ----------------------
+  const allTopics = data.flatMap((c) => c.topics ?? []);
+  const allPostsForSelect = data.flatMap((c) =>
+    (c.topics ?? []).flatMap((t) =>
+      (t.posts ?? []).map((p) => ({ id: p.id, content: p.content }))
+    )
+  );
+  const allPostsFull = data.flatMap((c) =>
+    (c.topics ?? []).flatMap((t) => t.posts ?? [])
+  );
 
   // ----------------------
   // Render
@@ -372,15 +413,14 @@ const NestedForumPage: React.FC = () => {
       {loading ? (
         <Typography>Loading...</Typography>
       ) : (
-        <RichTreeView
+        <SimpleTreeView
           defaultCollapseIcon={<ExpandMore />}
           defaultExpandIcon={<ChevronRight />}
         >
           {renderCategories()}
-        </RichTreeView>
+        </SimpleTreeView>
       )}
 
-      {/* Dialogs */}
       <CategoryDialog
         open={categoryDialog}
         form={categoryForm}
@@ -388,19 +428,23 @@ const NestedForumPage: React.FC = () => {
         onClose={() => setCategoryDialog(false)}
         onSave={async () => {
           setSaving(true);
-          const url = categoryForm.id
-            ? `${API_CATEGORIES}${categoryForm.id}/`
-            : API_CATEGORIES;
+          try {
+            const url = categoryForm.id
+              ? `${API_CATEGORIES}${categoryForm.id}/`
+              : API_CATEGORIES;
 
-          await fetch(url, {
-            method: categoryForm.id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(categoryForm),
-          });
+            const res = await fetch(url, {
+              method: categoryForm.id ? "PUT" : "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(categoryForm),
+            });
 
-          setSaving(false);
-          setCategoryDialog(false);
-          loadData();
+            if (!res.ok) console.error("Category save failed", res.status);
+          } finally {
+            setSaving(false);
+            setCategoryDialog(false);
+            loadData();
+          }
         }}
         saving={saving}
       />
@@ -413,19 +457,21 @@ const NestedForumPage: React.FC = () => {
         onClose={() => setTopicDialog(false)}
         onSave={async () => {
           setSaving(true);
-          const url = topicForm.id
-            ? `${API_TOPICS}${topicForm.id}/`
-            : API_TOPICS;
+          try {
+            const url = topicForm.id ? `${API_TOPICS}${topicForm.id}/` : API_TOPICS;
 
-          await fetch(url, {
-            method: topicForm.id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(topicForm),
-          });
+            const res = await fetch(url, {
+              method: topicForm.id ? "PUT" : "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(topicForm),
+            });
 
-          setSaving(false);
-          setTopicDialog(false);
-          loadData();
+            if (!res.ok) console.error("Topic save failed", res.status);
+          } finally {
+            setSaving(false);
+            setTopicDialog(false);
+            loadData();
+          }
         }}
         saving={saving}
       />
@@ -433,24 +479,26 @@ const NestedForumPage: React.FC = () => {
       <PostDialog
         open={postDialog}
         form={postForm}
-        topics={data.flatMap((c) => c.topics)}
+        topics={allTopics}
         onChange={(f, v) => setPostForm({ ...postForm, [f]: v })}
         onClose={() => setPostDialog(false)}
         onSave={async () => {
           setSaving(true);
-          const url = postForm.id
-            ? `${API_POSTS}${postForm.id}/`
-            : API_POSTS;
+          try {
+            const url = postForm.id ? `${API_POSTS}${postForm.id}/` : API_POSTS;
 
-          await fetch(url, {
-            method: postForm.id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(postForm),
-          });
+            const res = await fetch(url, {
+              method: postForm.id ? "PUT" : "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(postForm),
+            });
 
-          setSaving(false);
-          setPostDialog(false);
-          loadData();
+            if (!res.ok) console.error("Post save failed", res.status);
+          } finally {
+            setSaving(false);
+            setPostDialog(false);
+            loadData();
+          }
         }}
         saving={saving}
       />
@@ -458,24 +506,26 @@ const NestedForumPage: React.FC = () => {
       <ReplyDialog
         open={replyDialog}
         form={replyForm}
-        posts={data.flatMap((c) => c.topics.flatMap((t) => t.posts))}
+        posts={allPostsForSelect}
         onChange={(f, v) => setReplyForm({ ...replyForm, [f]: v })}
         onClose={() => setReplyDialog(false)}
         onSave={async () => {
           setSaving(true);
-          const url = replyForm.id
-            ? `${API_REPLIES}${replyForm.id}/`
-            : API_REPLIES;
+          try {
+            const url = replyForm.id ? `${API_REPLIES}${replyForm.id}/` : API_REPLIES;
 
-          await fetch(url, {
-            method: replyForm.id ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(replyForm),
-          });
+            const res = await fetch(url, {
+              method: replyForm.id ? "PUT" : "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(replyForm),
+            });
 
-          setSaving(false);
-          setReplyDialog(false);
-          loadData();
+            if (!res.ok) console.error("Reply save failed", res.status);
+          } finally {
+            setSaving(false);
+            setReplyDialog(false);
+            loadData();
+          }
         }}
         saving={saving}
       />
@@ -483,21 +533,24 @@ const NestedForumPage: React.FC = () => {
       <PostLikeDialog
         open={likeDialog}
         form={likeForm}
-        posts={data.flatMap((c) => c.topics.flatMap((t) => t.posts))}
+        posts={allPostsFull}
         onChange={(f, v) => setLikeForm({ ...likeForm, [f]: v })}
         onClose={() => setLikeDialog(false)}
         onSave={async () => {
           setSaving(true);
+          try {
+            const res = await fetch(API_LIKES, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(likeForm),
+            });
 
-          await fetch(API_LIKES, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(likeForm),
-          });
-
-          setSaving(false);
-          setLikeDialog(false);
-          loadData();
+            if (!res.ok) console.error("Like save failed", res.status);
+          } finally {
+            setSaving(false);
+            setLikeDialog(false);
+            loadData();
+          }
         }}
         saving={saving}
       />
