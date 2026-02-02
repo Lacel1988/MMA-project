@@ -24,6 +24,8 @@ type Props = {
   saving: boolean;
 };
 
+
+
 const CategoryDialog: React.FC<Props> = ({
   open,
   form,
@@ -67,5 +69,8 @@ const CategoryDialog: React.FC<Props> = ({
     </DialogActions>
   </Dialog>
 );
+
+
+
 
 export default CategoryDialog;

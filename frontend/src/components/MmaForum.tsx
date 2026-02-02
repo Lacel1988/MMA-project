@@ -11,11 +11,13 @@ import {
   Favorite,
 } from "@mui/icons-material";
 
+import APIService from "../services/APIService";
 import CategoryDialog, { type CategoryForm } from "./dialogs/CategoryDialog";
 import TopicDialog, { type TopicForm } from "./dialogs/TopicDialog";
 import PostDialog, { type PostForm } from "./dialogs/PostDialog";
 import ReplyDialog, { type ReplyForm } from "./dialogs/ReplyDialog";
 import PostLikeDialog, { type PostLikeForm } from "./dialogs/PostLikeDialog";
+
 
 // ----------------------
 // Types (API shape)
@@ -72,13 +74,16 @@ const API_LIKES = API_BASE+"/api/likes/";
 const NestedForumPage: React.FC = () => {
   const [data, setData] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-
+  const [saving, setSaving] = useState(false);
   // Dialog states
   const [categoryDialog, setCategoryDialog] = useState(false);
   const [topicDialog, setTopicDialog] = useState(false);
   const [postDialog, setPostDialog] = useState(false);
   const [replyDialog, setReplyDialog] = useState(false);
   const [likeDialog, setLikeDialog] = useState(false);
+
+
+
 
   // Form states
   const [categoryForm, setCategoryForm] = useState<CategoryForm>({
@@ -106,7 +111,7 @@ const NestedForumPage: React.FC = () => {
     post: "",
   });
 
-  const [saving, setSaving] = useState(false);
+  /*const [saving, setSaving] = useState(false);*/
 
   // ----------------------
   // Helpers
@@ -119,7 +124,7 @@ const NestedForumPage: React.FC = () => {
     }
   };
 
-  const loadData = async () => {
+  /*const loadData = async () => {
     setLoading(true);
     try {
       const res = await fetch(API_CATEGORIES);
@@ -153,7 +158,63 @@ const NestedForumPage: React.FC = () => {
     } finally {
       loadData();
     }
-  };
+  };*/
+
+  
+
+
+
+// 🔄 Adatok betöltése
+const loadData = async () => {
+  setLoading(true);
+  try {
+    const categories = await APIService.loadData<Category[]>(API_CATEGORIES);
+    setData(categories);
+  } catch (error) {
+    console.error("Betöltési hiba:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// ➕ Létrehozás
+const createItem = async <T>(url: string, item: T) => {
+  setSaving(true);
+  try {
+    await APIService.createItem(url, item);
+    await loadData();
+  } catch (error) {
+    console.error("Létrehozási hiba:", error);
+  } finally {
+    setSaving(false);
+  }
+};
+
+// ✏️ Frissítés
+const updateItem = async <T extends { id: number }>(url: string, item: T) => {
+  setSaving(true);
+  try {
+    await APIService.updateItem(url, item);
+    await loadData();
+  } catch (error) {
+    console.error("Frissítési hiba:", error);
+  } finally {
+    setSaving(false);
+  }
+};
+
+// ❌ Törlés
+const deleteItem = async (url: string, id: number) => {
+  if (!window.confirm("Biztosan törlöd ezt az elemet?")) return;
+  try {
+    await APIService.deleteItem(url, id);
+    await loadData();
+  } catch (error) {
+    console.error("Törlési hiba:", error);
+  }
+};
+
+  
 
   // ----------------------
   // Render helpers
@@ -395,7 +456,7 @@ const NestedForumPage: React.FC = () => {
   return (
     <Box p={3}>
       <Stack direction="row" justifyContent="space-between" mb={2}>
-        <Typography variant="h4">Forum Structure</Typography>
+        <Typography variant="h4">Forum</Typography>
 
         <Button
           variant="contained"
