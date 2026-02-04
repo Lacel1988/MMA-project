@@ -11,7 +11,7 @@ import {
   Favorite,
 } from "@mui/icons-material";
 
-import APIService from "../services/APIService";
+import APIService from "./services/APIService";
 import CategoryDialog, { type CategoryForm } from "./dialogs/CategoryDialog";
 import TopicDialog, { type TopicForm } from "./dialogs/TopicDialog";
 import PostDialog, { type PostForm } from "./dialogs/PostDialog";
@@ -61,6 +61,7 @@ type Category = {
 // ----------------------
 // API endpoints
 // ----------------------
+
 const API_BASE = "http://127.0.0.1:8000";
 const API_CATEGORIES = API_BASE+"/api/categories/";
 const API_TOPICS = API_BASE+"/api/topics/";
@@ -72,7 +73,12 @@ const API_LIKES = API_BASE+"/api/likes/";
 // Main Component
 // ----------------------
 const NestedForumPage: React.FC = () => {
-  const [data, setData] = useState<Category[]>([]);
+  const [Reply, setReply] = useState<Reply[]>([]);
+  const [Like, setLike] = useState<Like[]>([]);
+  const [Post, setPost] = useState<Post[]>([]);
+  const [Topic, setTopic] = useState<Topic[]>([]);
+  const [Category, setCategory] = useState<Category[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   // Dialog states
@@ -81,7 +87,6 @@ const NestedForumPage: React.FC = () => {
   const [postDialog, setPostDialog] = useState(false);
   const [replyDialog, setReplyDialog] = useState(false);
   const [likeDialog, setLikeDialog] = useState(false);
-
 
 
 
@@ -111,18 +116,71 @@ const NestedForumPage: React.FC = () => {
     post: "",
   });
 
+
   /*const [saving, setSaving] = useState(false);*/
 
   // ----------------------
   // Helpers
   // ----------------------
-  const safeJson = async (res: Response) => {
+ async function safeJson (res: Response) {
     try {
       return await res.json();
     } catch {
       return null;
     }
   };
+
+// 🔄 Load data
+async function loadData<T>(url: string, setState: React.Dispatch<React.SetStateAction<T[]>>): Promise<void> {
+  setLoading(true);
+  try {
+    const data = await APIService.loadData<T[]>(url);
+    setState(data);
+  } catch (err) {
+    console.error("Load error:", err);
+  } finally {
+    setLoading(false);
+  }
+}
+
+//loadData(API_CATEGORIES, setCategory);
+
+// ➕ Create item
+async function createItem  <T>(url: string, item: T, cType: React.Dispatch<React.SetStateAction<T[]>>): Promise<void> {
+  setSaving(true);
+  try {
+    await APIService.createItem(url, item);
+    await loadData(url, cType);
+  } catch (err) {
+    console.error("Create error:", err);
+  } finally {
+    setSaving(false);
+  }
+};
+
+// ✏️ Update item
+async function updateItem <T extends { id: number }>(url: string, item: T, uType: React.Dispatch<React.SetStateAction<T[]>>): Promise<void>  {
+  setSaving(true);
+  try {
+    await APIService.updateItem(url, item);
+    await loadData(url, uType);
+  } catch (err) {
+    console.error("Update error:", err);
+  } finally {
+    setSaving(false);
+  }
+};
+
+// ❌ Delete item
+async function  deleteItem <T>(url: string, id: number, dType: React.Dispatch<React.SetStateAction<T[]>>): Promise<void>  {
+  if (!window.confirm("Are you sure you want to delete this item?")) return;
+  try {
+    await APIService.deleteItem(url, id);
+    await loadData(url, dType);
+  } catch (err) {
+    console.error("Delete error:", err);
+  }
+};
 
   /*const loadData = async () => {
     setLoading(true);
@@ -164,55 +222,10 @@ const NestedForumPage: React.FC = () => {
 
 
 
-// 🔄 Adatok betöltése
-const loadData = async () => {
-  setLoading(true);
-  try {
-    const categories = await APIService.loadData<Category[]>(API_CATEGORIES);
-    setData(categories);
-  } catch (error) {
-    console.error("Betöltési hiba:", error);
-  } finally {
-    setLoading(false);
-  }
-};
 
-// ➕ Létrehozás
-const createItem = async <T>(url: string, item: T) => {
-  setSaving(true);
-  try {
-    await APIService.createItem(url, item);
-    await loadData();
-  } catch (error) {
-    console.error("Létrehozási hiba:", error);
-  } finally {
-    setSaving(false);
-  }
-};
 
-// ✏️ Frissítés
-const updateItem = async <T extends { id: number }>(url: string, item: T) => {
-  setSaving(true);
-  try {
-    await APIService.updateItem(url, item);
-    await loadData();
-  } catch (error) {
-    console.error("Frissítési hiba:", error);
-  } finally {
-    setSaving(false);
-  }
-};
 
-// ❌ Törlés
-const deleteItem = async (url: string, id: number) => {
-  if (!window.confirm("Biztosan törlöd ezt az elemet?")) return;
-  try {
-    await APIService.deleteItem(url, id);
-    await loadData();
-  } catch (error) {
-    console.error("Törlési hiba:", error);
-  }
-};
+
 
   
 
@@ -247,7 +260,7 @@ const deleteItem = async (url: string, id: number) => {
             <IconButton
               size="small"
               color="error"
-              onClick={() => deleteItem(`${API_REPLIES}${reply.id}/`)}
+              onClick={() => deleteItem(API_REPLIES,reply.id, setReply)}
             >
               <Delete fontSize="small" />
             </IconButton>
@@ -268,7 +281,7 @@ const deleteItem = async (url: string, id: number) => {
             <IconButton
               size="small"
               color="error"
-              onClick={() => deleteItem(`${API_LIKES}${like.id}/`)}
+              onClick={() => deleteItem(API_LIKES,like.id, setLike)}
             >
               <Delete fontSize="small" />
             </IconButton>
@@ -305,7 +318,7 @@ const deleteItem = async (url: string, id: number) => {
             <IconButton
               size="small"
               color="error"
-              onClick={() => deleteItem(`${API_POSTS}${post.id}/`)}
+              onClick={() => deleteItem(API_POSTS,post.id, setPost)}
             >
               <Delete fontSize="small" />
             </IconButton>
@@ -369,7 +382,7 @@ const deleteItem = async (url: string, id: number) => {
             <IconButton
               size="small"
               color="error"
-              onClick={() => deleteItem(`${API_TOPICS}${topic.id}/`)}
+              onClick={() => deleteItem(API_TOPICS, topic.id, setTopic)}
             >
               <Delete fontSize="small" />
             </IconButton>
@@ -416,7 +429,7 @@ const deleteItem = async (url: string, id: number) => {
             <IconButton
               size="small"
               color="error"
-              onClick={() => deleteItem(`${API_CATEGORIES}${cat.id}/`)}
+              onClick={() => deleteItem(API_CATEGORIES, cat.id, setCategory)}
             >
               <Delete />
             </IconButton>
@@ -499,7 +512,7 @@ const deleteItem = async (url: string, id: number) => {
           } finally {
             setSaving(false);
             setCategoryDialog(false);
-            loadData();
+            loadData(API_CATEGORIES, setCategory);
           }
         }}
         saving={saving}
@@ -526,7 +539,7 @@ const deleteItem = async (url: string, id: number) => {
           } finally {
             setSaving(false);
             setTopicDialog(false);
-            loadData();
+            loadData(API_TOPICS, setTopic);
           }
         }}
         saving={saving}
@@ -553,7 +566,7 @@ const deleteItem = async (url: string, id: number) => {
           } finally {
             setSaving(false);
             setPostDialog(false);
-            loadData();
+            loadData(API_POSTS, setPost);
           }
         }}
         saving={saving}
@@ -580,7 +593,7 @@ const deleteItem = async (url: string, id: number) => {
           } finally {
             setSaving(false);
             setReplyDialog(false);
-            loadData();
+            loadData(API_REPLIES, setReply);
           }
         }}
         saving={saving}
@@ -605,7 +618,7 @@ const deleteItem = async (url: string, id: number) => {
           } finally {
             setSaving(false);
             setLikeDialog(false);
-            loadData();
+            loadData(API_LIKES, setLike);
           }
         }}
         saving={saving}
