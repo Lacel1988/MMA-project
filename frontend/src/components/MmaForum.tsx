@@ -17,6 +17,7 @@ import TopicDialog, { type TopicForm } from "./dialogs/TopicDialog";
 import PostDialog, { type PostForm } from "./dialogs/PostDialog";
 import ReplyDialog, { type ReplyForm } from "./dialogs/ReplyDialog";
 import PostLikeDialog, { type PostLikeForm } from "./dialogs/PostLikeDialog";
+//import { setDataStartEndIndexes } from "recharts/types/state/chartDataSlice";
 
 
 // ----------------------
@@ -81,6 +82,7 @@ const NestedForumPage: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [data, setData] = useState<Category[]>([]);
   // Dialog states
   const [categoryDialog, setCategoryDialog] = useState(false);
   const [topicDialog, setTopicDialog] = useState(false);
@@ -403,6 +405,7 @@ async function  deleteItem <T>(url: string, id: number, dType: React.Dispatch<Re
       </TreeItem>
     ));
 
+setData(Category)
   const renderCategories = () =>
     data.map((cat) => (
       <TreeItem
