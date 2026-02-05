@@ -4,26 +4,24 @@ export type UnitSystem = "EU" | "US";
 
 type UnitContextValue = {
   unit: UnitSystem;
-  setUnit: (u: UnitSystem) => void;
   toggleUnit: () => void;
 };
 
 const UnitContext = createContext<UnitContextValue | undefined>(undefined);
 
 export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [unit, setUnitState] = useState<UnitSystem>(() => {
+  const [unit, setUnit] = useState<UnitSystem>(() => {
     const saved = localStorage.getItem("unitSystem");
     return (saved as UnitSystem) || "EU";
   });
 
-  const setUnit = (u: UnitSystem) => {
-    localStorage.setItem("unitSystem", u);
-    setUnitState(u);
+  const toggleUnit = () => {
+    const next = unit === "EU" ? "US" : "EU";
+    setUnit(next);
+    localStorage.setItem("unitSystem", next);
   };
 
-  const toggleUnit = () => setUnit(unit === "EU" ? "US" : "EU");
-
-  const value = useMemo(() => ({ unit, setUnit, toggleUnit }), [unit]);
+  const value = useMemo(() => ({ unit, toggleUnit }), [unit]);
 
   return <UnitContext.Provider value={value}>{children}</UnitContext.Provider>;
 };
