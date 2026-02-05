@@ -1,3 +1,4 @@
+import StyledSwitch from "../components/StyledSwitch";
 import { Card, CardContent, Chip, Box, Typography } from "@mui/material";
 import type { Fighter } from "../types";
 
