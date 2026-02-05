@@ -2,8 +2,8 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import Switch, { SwitchProps } from "@mui/material/Switch";
 
-import euFlagUrl from "./assets/eu.png";
-import usFlagUrl from "./assets/us.png";
+import euFlagUrl from "./assets/eu.svg";
+import usFlagUrl from "./assets/us.svg";
 
 type FlagSwitchProps = Omit<SwitchProps, "icon" | "checkedIcon">;
 
