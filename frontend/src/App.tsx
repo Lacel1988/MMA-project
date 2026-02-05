@@ -12,6 +12,9 @@ import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
 import CategoriesPage from "./components/MmaForum";
 
+// ⬇️ EZ AZ ÚJ IMPORT
+import { UnitProvider } from "./context/UnitContext";
+
 type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
 const API_URL = "http://127.0.0.1:8000/api";
@@ -140,7 +143,9 @@ export default function App() {
                 setKivalasztott((prev) => (prev ? { ...prev, ...patch } : prev));
 
                 if (id != null) {
-                  setFighters((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+                  setFighters((prev) =>
+                    prev.map((f) => (f.id === id ? { ...f, ...patch } : f))
+                  );
                 }
 
                 setLeft((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
@@ -178,43 +183,42 @@ export default function App() {
       )}
 
       {/* FORUM */}
-      {aktivFül === "Forum" && (
-        <CategoriesPage />
-
-
-      )}
+      {aktivFül === "Forum" && <CategoriesPage />}
     </>
   );
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#0b0b0b" }}>
-      <Navbar
-        height={NAV_H}
-        aktivFül={aktivFül}
-        setAktivFül={setAktivFül}
-        user={user}
-        onLogout={handleLogout}
-      />
+    // ⬇️ ⬇️ ⬇️ IDE RAKTAM A PROVIDER-T – EZ AZ EGYETLEN MÓDOSÍTÁS
+    <UnitProvider>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#0b0b0b" }}>
+        <Navbar
+          height={NAV_H}
+          aktivFül={aktivFül}
+          setAktivFül={setAktivFül}
+          user={user}
+          onLogout={handleLogout}
+        />
 
-      <Box sx={{ height: NAV_H }} />
+        <Box sx={{ height: NAV_H }} />
 
-      <Box
-        component="main"
-        sx={{
-          minHeight: `calc(100vh - ${NAV_H}px)`,
-          bgcolor: "#0b0b0b",
-        }}
-      >
-        {aktivFül === "Compare" ? (
-          <Box sx={{ py: 3, px: { xs: 2, sm: 3, md: 4 } }}>
-            <Box sx={{ maxWidth: 1100, mx: "auto" }}>{tartalom}</Box>
-          </Box>
-        ) : (
-          <Container maxWidth="xl" sx={{ py: 3 }}>
-            {tartalom}
-          </Container>
-        )}
+        <Box
+          component="main"
+          sx={{
+            minHeight: `calc(100vh - ${NAV_H}px)`,
+            bgcolor: "#0b0b0b",
+          }}
+        >
+          {aktivFül === "Compare" ? (
+            <Box sx={{ py: 3, px: { xs: 2, sm: 3, md: 4 } }}>
+              <Box sx={{ maxWidth: 1100, mx: "auto" }}>{tartalom}</Box>
+            </Box>
+          ) : (
+            <Container maxWidth="xl" sx={{ py: 3 }}>
+              {tartalom}
+            </Container>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </UnitProvider>
   );
 }
