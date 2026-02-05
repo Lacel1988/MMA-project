@@ -1,4 +1,4 @@
-import StyledSwitch from "../components/StyledSwitch";
+import UnitSwitch from "../components/UnitSwitch";
 import { Card, CardContent, Chip, Box, Typography } from "@mui/material";
 import type { Fighter } from "../types";
 
@@ -10,7 +10,7 @@ type Props = {
 
 export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
   return (
-    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}> <StyledSwitch /> </Box>
+    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}> <UnitSwitch /> </Box>
     <Box
       sx={{
         display: "grid",
