@@ -10,6 +10,7 @@ type Props = {
 
 export default function FighterGrid({ fighters, onSelect, selectedId }: Props) {
   return (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}> <StyledSwitch /> </Box>
     <Box
       sx={{
         display: "grid",
