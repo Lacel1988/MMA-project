@@ -1,11 +1,11 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import Switch, { SwitchProps } from "@mui/material/Switch";
+import Switch from "@mui/material/Switch";
 
-import euFlagUrl from "./assets/eu.svg";
-import usFlagUrl from "./assets/us.svg";
+import euFlagUrl from "../assets/eu.svg";
+import usFlagUrl from "../assets/us.svg";
 
-type FlagSwitchProps = Omit<SwitchProps, "icon" | "checkedIcon">;
+type FlagSwitchProps = Omit<React.Component, "icon" | "checkedIcon">;
 
 const StyledSwitch = styled((props: FlagSwitchProps) => (
   <Switch

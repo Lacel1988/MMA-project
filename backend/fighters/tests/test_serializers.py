@@ -27,7 +27,7 @@ class FighterSerializerTests(TestCase):
                 known_fighter_names.cache_clear()
 
                 data = {
-                    "name": "Jon Jons",  # elgépelés
+                    "name": "Jon Jons",  
                     "division_id": self.division.id,
                     "age": 30,
                     "weight": "70.00",

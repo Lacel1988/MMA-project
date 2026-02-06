@@ -186,6 +186,7 @@ export default function App() {
       {aktivFül === "Forum" && <CategoriesPage />}
     </>
   );
+  
 
   return (
     // ⬇️ ⬇️ ⬇️ IDE RAKTAM A PROVIDER-T – EZ AZ EGYETLEN MÓDOSÍTÁS
