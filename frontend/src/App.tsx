@@ -1,5 +1,14 @@
-import { useEffect, useState } from "react";
-import { Container, Box, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Container,
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Drawer,
+} from "@mui/material";
+import TuneIcon from "@mui/icons-material/Tune";
+
 import Navbar from "./components/Navbar";
 import FighterGrid from "./components/FighterGrid";
 import FighterDetails from "./components/FighterDetails";
@@ -12,8 +21,10 @@ import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
 import CategoriesPage from "./components/MmaForum";
 
-// ⬇️ EZ AZ ÚJ IMPORT
 import { UnitProvider } from "./context/UnitContext";
+
+import FilterSidebar from "./components/FilterSidebar";
+import DivisionsPanel from "./components/DivisionsPanel";
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
@@ -29,11 +40,15 @@ export default function App() {
   const [aktivFül, setAktivFül] = useState<Ful>("Auth");
 
   const [user, setUser] = useState<MeResponse | null>(null);
-
   const isAdmin = !!user?.is_staff || !!user?.is_superuser;
 
   const [left, setLeft] = useState<Fighter | null>(null);
   const [right, setRight] = useState<Fighter | null>(null);
+
+  // Filter state-ek
+  const [aktivDivisionId, setAktivDivisionId] = useState<number | null>(null);
+  const [filterNyitva, setFilterNyitva] = useState(false);
+  const [kereses, setKereses] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -74,6 +89,48 @@ export default function App() {
     setAktivFül("Auth");
   }
 
+  // Szűrés: Division + Search (2 karaktertől)
+  const szurtFighters = useMemo(() => {
+    const q = kereses.trim().toLowerCase();
+
+    return fighters.filter((f) => {
+      const okDivision =
+        aktivDivisionId == null ? true : f.division?.id === aktivDivisionId;
+
+      const okSearch =
+        q.length < 2 ? true : (f.name ?? "").toLowerCase().includes(q);
+
+      return okDivision && okSearch;
+    });
+  }, [fighters, aktivDivisionId, kereses]);
+
+  // Anim kulcs: ha változik a keresés vagy divízió, újra animál
+  const animKey = `${aktivDivisionId ?? "all"}|${kereses.trim().toLowerCase()}`;
+
+  const filterContent = (
+    <>
+      <TextField
+        label="Search"
+        value={kereses}
+        onChange={(e) => setKereses(e.target.value)}
+        size="small"
+        placeholder="Min 2 karakter"
+        sx={{
+          mb: 2,
+          "& .MuiOutlinedInput-root": { bgcolor: "rgba(0,0,0,0.04)" },
+        }}
+        InputLabelProps={{ sx: { fontWeight: 900 } }}
+      />
+
+      <DivisionsPanel
+        fighters={fighters}
+        aktivDivisionId={aktivDivisionId}
+        setAktivDivisionId={setAktivDivisionId}
+        variant="light"
+      />
+    </>
+  );
+
   const tartalom = hiba ? (
     <Typography sx={{ color: "#ff6b6b" }}>Error: {hiba}</Typography>
   ) : (
@@ -112,25 +169,59 @@ export default function App() {
           sx={{
             display: "grid",
             gap: 3,
-            gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" },
+            gridTemplateColumns: {
+              xs: "1fr",
+              lg: `${filterNyitva ? 280 : 48}px 2fr 1fr`,
+            },
             alignItems: "start",
           }}
         >
+          {/* BAL: desktop sidebar (lg+) */}
+          <Box sx={{ display: { xs: "none", lg: "block" } }}>
+            <FilterSidebar
+              navbarHeight={NAV_H}
+              open={filterNyitva}
+              setOpen={setFilterNyitva}
+              expandedWidth={280}
+              collapsedWidth={48}
+            >
+              {filterContent}
+            </FilterSidebar>
+          </Box>
+
+          {/* KÖZÉP: grid + mobil filter gomb */}
           <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ display: { xs: "flex", lg: "none" }, mb: 2, gap: 1 }}>
+              <Button
+                onClick={() => setFilterNyitva(true)}
+                startIcon={<TuneIcon />}
+                variant="contained"
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 900,
+                  bgcolor: "#b71c1c",
+                  "&:hover": { bgcolor: "#c62828" },
+                }}
+              >
+                Filters
+              </Button>
+            </Box>
+
             <FighterGrid
-              fighters={fighters}
+              fighters={szurtFighters}
               selectedId={kivalasztott?.id ?? null}
               onSelect={(f) => setKivalasztott(f)}
+              animKey={animKey}
             />
           </Box>
 
+          {/* JOBB: preview sticky */}
           <Box
             sx={{
               minWidth: 0,
               position: { lg: "sticky" },
-              top: { lg: 12 },
+              top: { lg: NAV_H + 12 },
               alignSelf: "start",
-              pt: { lg: 8 },
             }}
           >
             <FighterDetails
@@ -153,6 +244,23 @@ export default function App() {
               }}
             />
           </Box>
+
+          {/* MOBIL/TABLET: Drawer filter */}
+          <Drawer
+            anchor="left"
+            open={filterNyitva}
+            onClose={() => setFilterNyitva(false)}
+            sx={{ display: { xs: "block", lg: "none" } }}
+            PaperProps={{
+              sx: {
+                width: 320,
+                bgcolor: "#fff",
+                p: 2,
+              },
+            }}
+          >
+            {filterContent}
+          </Drawer>
         </Box>
       )}
 
@@ -186,10 +294,8 @@ export default function App() {
       {aktivFül === "Forum" && <CategoriesPage />}
     </>
   );
-  
 
   return (
-    // ⬇️ ⬇️ ⬇️ IDE RAKTAM A PROVIDER-T – EZ AZ EGYETLEN MÓDOSÍTÁS
     <UnitProvider>
       <Box sx={{ minHeight: "100vh", bgcolor: "#0b0b0b" }}>
         <Navbar
@@ -200,6 +306,7 @@ export default function App() {
           onLogout={handleLogout}
         />
 
+        {/* Spacer a fixed navbar alá */}
         <Box sx={{ height: NAV_H }} />
 
         <Box

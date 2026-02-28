@@ -149,6 +149,7 @@ export default function UfcRadarChart({
               fillOpacity={0.22}
               strokeWidth={3}
               dot={{ r: 2 }}
+              animationDuration={0}
             />
           </RadarChart>
         </ResponsiveContainer>
