@@ -1,37 +1,37 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Drawer,
-} from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
+import { Container, Box, Typography, IconButton, Tooltip } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 import Navbar from "./components/Navbar";
 import FighterGrid from "./components/FighterGrid";
 import FighterDetails from "./components/FighterDetails";
 import ComparePanel from "./components/compare/ComparePanel";
+import CategoriesPage from "./components/MmaForum";
 
 import AuthPanel from "./components/auth/AuthPanel";
 import AuthHero from "./components/auth/AuthHero";
 
 import type { Fighter } from "./types";
 import { fetchMe, logout, type MeResponse } from "./api/authApi";
-import CategoriesPage from "./components/MmaForum";
-
 import { UnitProvider } from "./context/UnitContext";
 
 import FilterSidebar from "./components/FilterSidebar";
-import DivisionsPanel from "./components/DivisionsPanel";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
 const API_URL = "http://127.0.0.1:8000/api";
 
+type Division = {
+  id: number;
+  name: string;
+};
+
 export default function App() {
   const NAV_H = 64;
+  const drawerWidth = 360;
+
+  const isDesktop = useMediaQuery("(min-width:1200px)");
 
   const [fighters, setFighters] = useState<Fighter[]>([]);
   const [hiba, setHiba] = useState<string>("");
@@ -45,10 +45,9 @@ export default function App() {
   const [left, setLeft] = useState<Fighter | null>(null);
   const [right, setRight] = useState<Fighter | null>(null);
 
-  // Filter state-ek
+  const [filterOpen, setFilterOpen] = useState(false);
   const [aktivDivisionId, setAktivDivisionId] = useState<number | null>(null);
-  const [filterNyitva, setFilterNyitva] = useState(false);
-  const [kereses, setKereses] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -89,53 +88,53 @@ export default function App() {
     setAktivFül("Auth");
   }
 
-  // Szűrés: Division + Search (2 karaktertől)
-  const szurtFighters = useMemo(() => {
-    const q = kereses.trim().toLowerCase();
+  const divisions: Division[] = useMemo(() => {
+    const map = new Map<number, Division>();
+
+    for (const f of fighters as any[]) {
+      const d = f?.division;
+      if (d && typeof d?.id === "number" && typeof d?.name === "string") {
+        map.set(d.id, { id: d.id, name: d.name });
+      }
+    }
+
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [fighters]);
+
+  const filteredFighters = useMemo(() => {
+    const q = search.trim().toLowerCase();
 
     return fighters.filter((f) => {
-      const okDivision =
-        aktivDivisionId == null ? true : f.division?.id === aktivDivisionId;
+      const okDiv = aktivDivisionId === null ? true : f.division?.id === aktivDivisionId;
+      if (!okDiv) return false;
 
-      const okSearch =
-        q.length < 2 ? true : (f.name ?? "").toLowerCase().includes(q);
+      if (!q) return true;
 
-      return okDivision && okSearch;
+      const name = (f.name ?? "").toLowerCase();
+      const nick = ((f as any).nickname ?? "").toString().toLowerCase();
+      return name.includes(q) || nick.includes(q);
     });
-  }, [fighters, aktivDivisionId, kereses]);
+  }, [fighters, aktivDivisionId, search]);
 
-  // Anim kulcs: ha változik a keresés vagy divízió, újra animál
-  const animKey = `${aktivDivisionId ?? "all"}|${kereses.trim().toLowerCase()}`;
+  useEffect(() => {
+    if (aktivFül !== "Fighters" && aktivFül !== "Details") return;
 
-  const filterContent = (
-    <>
-      <TextField
-        label="Search"
-        value={kereses}
-        onChange={(e) => setKereses(e.target.value)}
-        size="small"
-        placeholder="Min 2 karakter"
-        sx={{
-          mb: 2,
-          "& .MuiOutlinedInput-root": { bgcolor: "rgba(0,0,0,0.04)" },
-        }}
-        InputLabelProps={{ sx: { fontWeight: 900 } }}
-      />
+    if (!kivalasztott) {
+      setKivalasztott(filteredFighters[0] ?? null);
+      return;
+    }
 
-      <DivisionsPanel
-        fighters={fighters}
-        aktivDivisionId={aktivDivisionId}
-        setAktivDivisionId={setAktivDivisionId}
-        variant="light"
-      />
-    </>
-  );
+    const exists = filteredFighters.some((x) => x.id === kivalasztott.id);
+    if (!exists) setKivalasztott(filteredFighters[0] ?? null);
+  }, [filteredFighters, aktivFül]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const pageLeftPadding =
+    aktivFül === "Fighters" && isDesktop && filterOpen ? drawerWidth : 0;
 
   const tartalom = hiba ? (
     <Typography sx={{ color: "#ff6b6b" }}>Error: {hiba}</Typography>
   ) : (
     <>
-      {/* AUTH */}
       {aktivFül === "Auth" && (
         <Box
           sx={{
@@ -163,108 +162,93 @@ export default function App() {
         </Box>
       )}
 
-      {/* FIGHTERS */}
       {aktivFül === "Fighters" && (
-        <Box
-          sx={{
-            display: "grid",
-            gap: 3,
-            gridTemplateColumns: {
-              xs: "1fr",
-              lg: `${filterNyitva ? 280 : 48}px 2fr 1fr`,
-            },
-            alignItems: "start",
-          }}
-        >
-          {/* BAL: desktop sidebar (lg+) */}
-          <Box sx={{ display: { xs: "none", lg: "block" } }}>
-            <FilterSidebar
-              navbarHeight={NAV_H}
-              open={filterNyitva}
-              setOpen={setFilterNyitva}
-              expandedWidth={280}
-              collapsedWidth={48}
-            >
-              {filterContent}
-            </FilterSidebar>
-          </Box>
-
-          {/* KÖZÉP: grid + mobil filter gomb */}
-          <Box sx={{ minWidth: 0 }}>
-            <Box sx={{ display: { xs: "flex", lg: "none" }, mb: 2, gap: 1 }}>
-              <Button
-                onClick={() => setFilterNyitva(true)}
-                startIcon={<TuneIcon />}
-                variant="contained"
+        <Box sx={{ position: "relative" }}>
+          {/* Filter gomb: csak akkor, ha nincs nyitva a filter */}
+          {!filterOpen && (
+            <Tooltip title="Filters">
+              <IconButton
+                onClick={() => setFilterOpen(true)}
                 sx={{
-                  textTransform: "none",
-                  fontWeight: 900,
-                  bgcolor: "#b71c1c",
-                  "&:hover": { bgcolor: "#c62828" },
+                  position: "fixed",
+                  left: 16,
+                  top: NAV_H + 16,
+                  zIndex: 1500,
+                  bgcolor: "rgba(0,0,0,0.55)",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  backdropFilter: "blur(10px)",
+                  color: "white",
+                  "&:hover": { bgcolor: "rgba(0,0,0,0.75)" },
                 }}
               >
-                Filters
-              </Button>
-            </Box>
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          )}
 
-            <FighterGrid
-              fighters={szurtFighters}
-              selectedId={kivalasztott?.id ?? null}
-              onSelect={(f) => setKivalasztott(f)}
-              animKey={animKey}
-            />
-          </Box>
+          <FilterSidebar
+            open={filterOpen}
+            onClose={() => setFilterOpen(false)}
+            divisions={divisions}
+            aktivDivisionId={aktivDivisionId}
+            setAktivDivisionId={setAktivDivisionId}
+            search={search}
+            setSearch={setSearch}
+            title="Division filter"
+            navHeight={NAV_H}
+            variant={isDesktop ? "persistent" : "temporary"}
+          />
 
-          {/* JOBB: preview sticky */}
+          {/* CONTENT: desktopon tolódik jobbra, ha nyitva a drawer */}
           <Box
             sx={{
-              minWidth: 0,
-              position: { lg: "sticky" },
-              top: { lg: NAV_H + 12 },
-              alignSelf: "start",
+              pl: `${pageLeftPadding}px`,
+              transition: "padding-left 200ms ease",
+              display: "grid",
+              gap: 3,
+              gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" },
+              alignItems: "start",
             }}
           >
-            <FighterDetails
-              fighter={kivalasztott}
-              mode="preview"
-              isAdmin={isAdmin}
-              onUpdated={(patch) => {
-                const id = kivalasztott?.id;
+            <Box sx={{ minWidth: 0 }}>
+              <FighterGrid
+                fighters={filteredFighters}
+                selectedId={kivalasztott?.id ?? null}
+                onSelect={(f) => setKivalasztott(f)}
+              />
+            </Box>
 
-                setKivalasztott((prev) => (prev ? { ...prev, ...patch } : prev));
-
-                if (id != null) {
-                  setFighters((prev) =>
-                    prev.map((f) => (f.id === id ? { ...f, ...patch } : f))
-                  );
-                }
-
-                setLeft((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
-                setRight((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
+            <Box
+              sx={{
+                minWidth: 0,
+                position: { lg: "sticky" },
+                top: { lg: 12 },
+                alignSelf: "start",
+                pt: { lg: 8 },
               }}
-            />
-          </Box>
+            >
+              <FighterDetails
+                fighter={kivalasztott}
+                mode="preview"
+                isAdmin={isAdmin}
+                onUpdated={(patch) => {
+                  const id = kivalasztott?.id;
 
-          {/* MOBIL/TABLET: Drawer filter */}
-          <Drawer
-            anchor="left"
-            open={filterNyitva}
-            onClose={() => setFilterNyitva(false)}
-            sx={{ display: { xs: "block", lg: "none" } }}
-            PaperProps={{
-              sx: {
-                width: 320,
-                bgcolor: "#fff",
-                p: 2,
-              },
-            }}
-          >
-            {filterContent}
-          </Drawer>
+                  setKivalasztott((prev) => (prev ? { ...prev, ...patch } : prev));
+
+                  if (id != null) {
+                    setFighters((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+                  }
+
+                  setLeft((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
+                  setRight((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
+                }}
+              />
+            </Box>
+          </Box>
         </Box>
       )}
 
-      {/* DETAILS */}
       {aktivFül === "Details" && (
         <FighterDetails
           fighter={kivalasztott}
@@ -279,7 +263,6 @@ export default function App() {
         />
       )}
 
-      {/* COMPARE */}
       {aktivFül === "Compare" && (
         <ComparePanel
           fighters={fighters}
@@ -290,7 +273,6 @@ export default function App() {
         />
       )}
 
-      {/* FORUM */}
       {aktivFül === "Forum" && <CategoriesPage />}
     </>
   );
@@ -298,24 +280,11 @@ export default function App() {
   return (
     <UnitProvider>
       <Box sx={{ minHeight: "100vh", bgcolor: "#0b0b0b" }}>
-        <Navbar
-          height={NAV_H}
-          aktivFül={aktivFül}
-          setAktivFül={setAktivFül}
-          user={user}
-          onLogout={handleLogout}
-        />
+        <Navbar height={NAV_H} aktivFül={aktivFül} setAktivFül={setAktivFül} user={user} onLogout={handleLogout} />
 
-        {/* Spacer a fixed navbar alá */}
         <Box sx={{ height: NAV_H }} />
 
-        <Box
-          component="main"
-          sx={{
-            minHeight: `calc(100vh - ${NAV_H}px)`,
-            bgcolor: "#0b0b0b",
-          }}
-        >
+        <Box component="main" sx={{ minHeight: `calc(100vh - ${NAV_H}px)`, bgcolor: "#0b0b0b" }}>
           {aktivFül === "Compare" ? (
             <Box sx={{ py: 3, px: { xs: 2, sm: 3, md: 4 } }}>
               <Box sx={{ maxWidth: 1100, mx: "auto" }}>{tartalom}</Box>

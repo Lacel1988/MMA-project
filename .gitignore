@@ -15,3 +15,5 @@ fighters/__pycache__/
 ufcstats/__pycache__/
 forum/__pycache__/
 *.pyc
+node_modules/
+frontend/node_modules/

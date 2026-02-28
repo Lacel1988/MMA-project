@@ -12,34 +12,36 @@ class DivisionSerializer(serializers.ModelSerializer):
 
 
 class FighterSerializer(serializers.ModelSerializer):
-    # Kimenethez: részletes division objektum
     division = DivisionSerializer(read_only=True)
 
-    # Bemenethez: division id, hogy lehessen POST-olni
     division_id = serializers.PrimaryKeyRelatedField(
         queryset=Division.objects.all(),
         source="division",
         write_only=True,
-        required=True,
+        required=False,
+        allow_null=True,
     )
 
     class Meta:
         model = Fighter
         fields = "__all__"
 
-    def validate_name(self, value: str) -> str:
-        name = " ".join((value or "").strip().split())
+    def validate(self, attrs):
+        name = " ".join((attrs.get("name") or "").strip().split())
+        url = attrs.get("ufcstats_url") or None
+
         if not name:
-            raise serializers.ValidationError("Name cannot be empty.")
+            raise serializers.ValidationError({"name": "Name cannot be empty."})
 
-        if not is_known_fighter(name):
-            raise serializers.ValidationError("Fighter name is not present in UFCStats CSV reference.")
+        # URL-val együtt validálunk, ha van
+        if not is_known_fighter(name, url):
+            raise serializers.ValidationError({"name": "Fighter name is not present in UFCStats CSV reference."})
 
-        return name
+        attrs["name"] = name
+        return attrs
 
     def create(self, validated_data):
         obj = Fighter(**validated_data)
-        # Model validatorok + clean() is lefut, ha te raktál bele
         try:
             obj.full_clean()
         except DjangoValidationError as e:

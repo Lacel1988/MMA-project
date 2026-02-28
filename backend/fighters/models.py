@@ -17,19 +17,23 @@ class Fighter(models.Model):
         Division,
         on_delete=models.CASCADE,
         related_name="fighters",
+        null=True,
+        blank=True,
     )
 
     name = models.CharField(max_length=100)
 
     age = models.PositiveIntegerField(
+        null=True,
+        blank=True,
         validators=[
             MinValueValidator(0),
             MaxValueValidator(100),
-        ]
+        ],
     )
 
-    weight = models.DecimalField(max_digits=5, decimal_places=2)
-    height = models.DecimalField(max_digits=5, decimal_places=2)
+    weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    height = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     reach = models.PositiveSmallIntegerField(null=True, blank=True)
 
     wins = models.PositiveIntegerField(default=0)
@@ -38,8 +42,9 @@ class Fighter(models.Model):
 
     nickname = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
-    
-    ufcstats_url = models.URLField(blank = True, null = True)
+
+    # duplikáció ellen ez a legjobb kulcs, ha kitöltjük
+    ufcstats_url = models.URLField(blank=True, null=True, unique=True)
 
     upload_image = models.ImageField(
         upload_to="fighters/images/",
@@ -60,21 +65,18 @@ class Fighter(models.Model):
     def clean(self):
         super().clean()
 
-        
         name = (self.name or "").strip()
         if not name:
             raise ValidationError({"name": "Name cannot be empty."})
 
-    
         try:
             from fighters.services.ufcstats_registry import is_known_fighter
         except Exception:
-        
             raise ValidationError({"name": "Name validation service is unavailable."})
 
-        if not is_known_fighter(name):
+        # Ha van URL, URL alapján validál, különben név alapján
+        if not is_known_fighter(name, self.ufcstats_url):
             raise ValidationError({"name": "Fighter name is not present in UFCStats CSV reference."})
-
 
         self.name = name
 
