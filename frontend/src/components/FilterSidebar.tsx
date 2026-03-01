@@ -56,182 +56,192 @@ export default function FilterSidebar({
       open={open}
       onClose={onClose}
       variant={variant}
+      // temporary esetén a Modal tud scroll lockolni, ezt letiltjuk
       ModalProps={{
         keepMounted: true,
         disableScrollLock: true,
       }}
-      // Ez a lényeg: ne sötétítsen, ne "homályosítson"
+      // ne sötétítsen
       hideBackdrop={variant === "temporary"}
       PaperProps={{
         sx: {
           width: { xs: "86vw", sm: drawerWidth },
           maxWidth: 420,
+
           bgcolor: "#ffffff",
           color: "#111",
           borderRight: "1px solid rgba(0,0,0,0.10)",
+
+          // A lényeg: a navbar alá vágjuk a papírt, és fix magasságot adunk neki
+          top: `${navHeight}px`,
+          height: `calc(100vh - ${navHeight}px)`,
+
+          // Flex layout, hogy a tartalom biztosan scrollozható legyen
+          display: "flex",
+          flexDirection: "column",
+
+          // ne "hidden" legyen, mert az sokszor megöli a belső scrollt
           overflow: "hidden",
         },
       }}
     >
-      <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-        <Box
+      {/* HEADER */}
+      <Box
+        sx={{
+          px: 2,
+          py: 1.5,
+          bgcolor: "#ffffff",
+          borderBottom: "1px solid rgba(0,0,0,0.10)",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          flex: "0 0 auto",
+        }}
+      >
+        <Typography
           sx={{
-            position: "sticky",
-            top: 0,
-            zIndex: 1,
-            px: 2,
-            py: 1.5,
-            bgcolor: "#ffffff",
-            borderBottom: "1px solid rgba(0,0,0,0.10)",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
+            fontWeight: 900,
+            letterSpacing: 0.6,
+            fontFamily: "var(--mma-title-font)",
           }}
         >
-          <Typography
+          {title}
+        </Typography>
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <IconButton onClick={onClose} sx={{ color: "#111" }}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      {/* SCROLL AREA */}
+      <Box
+        sx={{
+          px: 2,
+          py: 2,
+          overflowY: "auto",
+          flex: "1 1 auto",
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 13,
+            opacity: 0.75,
+            mb: 1,
+            fontFamily: "var(--mma-title-font)",
+          }}
+        >
+          Search
+        </Typography>
+
+        <TextField
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Type fighter name..."
+          size="small"
+          fullWidth
+          InputProps={{
+            sx: {
+              bgcolor: "rgba(0,0,0,0.06)",
+              color: "#111",
+              borderRadius: 2,
+              fontFamily: "var(--mma-body-font)",
+            },
+          }}
+          sx={{
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(0,0,0,0.20)",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(0,0,0,0.35)",
+            },
+            "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(183,28,28,0.75)",
+            },
+          }}
+        />
+
+        <Box sx={{ display: "flex", gap: 1, mt: 1.25 }}>
+          <Button
+            onClick={() => {
+              setSearch("");
+              setAktivDivisionId(null);
+            }}
+            variant="contained"
             sx={{
+              textTransform: "none",
               fontWeight: 900,
-              letterSpacing: 0.6,
-              fontFamily: "var(--mma-title-font)",
+              bgcolor: "#b71c1c",
+              "&:hover": { bgcolor: "#c62828" },
             }}
           >
-            {title}
-          </Typography>
-
-          <Box sx={{ flexGrow: 1 }} />
-
-          <IconButton onClick={onClose} sx={{ color: "#111" }}>
-            <CloseIcon />
-          </IconButton>
+            Reset
+          </Button>
         </Box>
 
-        <Box
+        <Divider sx={{ my: 2, borderColor: "rgba(0,0,0,0.12)" }} />
+
+        <Typography
           sx={{
-            px: 2,
-            py: 2,
-            overflowY: "auto",
-            maxHeight: `calc(100vh - ${navHeight}px)`,
+            fontSize: 13,
+            opacity: 0.75,
+            mb: 1,
+            fontFamily: "var(--mma-title-font)",
           }}
         >
-          <Typography
+          Divisions
+        </Typography>
+
+        <List dense sx={{ p: 0 }}>
+          <ListItemButton
+            onClick={() => setAktivDivisionId(null)}
             sx={{
-              fontSize: 13,
-              opacity: 0.75,
-              mb: 1,
-              fontFamily: "var(--mma-title-font)",
+              borderRadius: 2,
+              mb: 0.5,
+              bgcolor: aktivDivisionId === null ? "rgba(183,28,28,0.10)" : "transparent",
+              border:
+                aktivDivisionId === null
+                  ? "1px solid rgba(183,28,28,0.35)"
+                  : "1px solid rgba(0,0,0,0.10)",
+              "&:hover": { bgcolor: "rgba(0,0,0,0.06)" },
             }}
           >
-            Search
-          </Typography>
-
-          <TextField
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Type fighter name..."
-            size="small"
-            fullWidth
-            InputProps={{
-              sx: {
-                bgcolor: "rgba(0,0,0,0.06)",
-                color: "#111",
-                borderRadius: 2,
-                fontFamily: "var(--mma-body-font)",
-              },
-            }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(0,0,0,0.20)",
-              },
-              "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(0,0,0,0.35)",
-              },
-              "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "rgba(183,28,28,0.75)",
-              },
-            }}
-          />
-
-          <Box sx={{ display: "flex", gap: 1, mt: 1.25 }}>
-            <Button
-              onClick={() => {
-                setSearch("");
-                setAktivDivisionId(null);
+            <ListItemText
+              primary="All"
+              primaryTypographyProps={{
+                sx: { fontWeight: 900, fontFamily: "var(--mma-title-font)" },
               }}
-              variant="contained"
-              sx={{
-                textTransform: "none",
-                fontWeight: 900,
-                bgcolor: "#b71c1c",
-                "&:hover": { bgcolor: "#c62828" },
-              }}
-            >
-              Reset
-            </Button>
-          </Box>
+            />
+          </ListItemButton>
 
-          <Divider sx={{ my: 2, borderColor: "rgba(0,0,0,0.12)" }} />
+          {divisions.map((d) => {
+            const aktiv = aktivDivisionId === d.id;
 
-          <Typography
-            sx={{
-              fontSize: 13,
-              opacity: 0.75,
-              mb: 1,
-              fontFamily: "var(--mma-title-font)",
-            }}
-          >
-            Divisions
-          </Typography>
-
-          <List dense sx={{ p: 0 }}>
-            <ListItemButton
-              onClick={() => setAktivDivisionId(null)}
-              sx={{
-                borderRadius: 2,
-                mb: 0.5,
-                bgcolor: aktivDivisionId === null ? "rgba(183,28,28,0.10)" : "transparent",
-                border:
-                  aktivDivisionId === null
-                    ? "1px solid rgba(183,28,28,0.35)"
-                    : "1px solid rgba(0,0,0,0.10)",
-                "&:hover": { bgcolor: "rgba(0,0,0,0.06)" },
-              }}
-            >
-              <ListItemText
-                primary="All"
-                primaryTypographyProps={{
-                  sx: { fontWeight: 900, fontFamily: "var(--mma-title-font)" },
+            return (
+              <ListItemButton
+                key={d.id}
+                onClick={() => setAktivDivisionId(d.id)}
+                sx={{
+                  borderRadius: 2,
+                  mb: 0.5,
+                  bgcolor: aktiv ? "rgba(183,28,28,0.10)" : "transparent",
+                  border: aktiv ? "1px solid rgba(183,28,28,0.35)" : "1px solid rgba(0,0,0,0.10)",
+                  "&:hover": { bgcolor: "rgba(0,0,0,0.06)" },
                 }}
-              />
-            </ListItemButton>
-
-            {divisions.map((d) => {
-              const aktiv = aktivDivisionId === d.id;
-
-              return (
-                <ListItemButton
-                  key={d.id}
-                  onClick={() => setAktivDivisionId(d.id)}
-                  sx={{
-                    borderRadius: 2,
-                    mb: 0.5,
-                    bgcolor: aktiv ? "rgba(183,28,28,0.10)" : "transparent",
-                    border: aktiv ? "1px solid rgba(183,28,28,0.35)" : "1px solid rgba(0,0,0,0.10)",
-                    "&:hover": { bgcolor: "rgba(0,0,0,0.06)" },
+              >
+                <ListItemText
+                  primary={d.name}
+                  primaryTypographyProps={{
+                    sx: { fontWeight: aktiv ? 950 : 800, fontFamily: "var(--mma-title-font)" },
                   }}
-                >
-                  <ListItemText
-                    primary={d.name}
-                    primaryTypographyProps={{
-                      sx: { fontWeight: aktiv ? 950 : 800, fontFamily: "var(--mma-title-font)" },
-                    }}
-                  />
-                </ListItemButton>
-              );
-            })}
-          </List>
+                />
+              </ListItemButton>
+            );
+          })}
+        </List>
 
-          <Box sx={{ height: 12 }} />
-        </Box>
+        <Box sx={{ height: 12 }} />
       </Box>
     </Drawer>
   );

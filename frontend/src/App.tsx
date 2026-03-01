@@ -218,13 +218,21 @@ export default function App() {
               />
             </Box>
 
+            {/* JOBB OLDAL: sticky, DE ha nagyobb a tartalom mint a viewport, akkor legyen belső scroll */}
             <Box
               sx={{
                 minWidth: 0,
                 position: { lg: "sticky" },
-                top: { lg: 12 },
+                top: { lg: NAV_H + 12 }, // biztosan a navbar alá kerül
                 alignSelf: "start",
-                pt: { lg: 8 },
+
+                // EZ A FIX: ha hosszú a jobb panel, görgethető legyen
+                maxHeight: { lg: `calc(100vh - ${NAV_H + 24}px)` },
+                overflowY: { lg: "auto" },
+                pr: { lg: 1 }, // hogy ne a szövegen menjen a scrollbar
+
+                // a korábbi pt:8 helyett inkább normális top-ot használunk
+                pt: 0,
               }}
             >
               <FighterDetails
@@ -280,7 +288,13 @@ export default function App() {
   return (
     <UnitProvider>
       <Box sx={{ minHeight: "100vh", bgcolor: "#0b0b0b" }}>
-        <Navbar height={NAV_H} aktivFül={aktivFül} setAktivFül={setAktivFül} user={user} onLogout={handleLogout} />
+        <Navbar
+          height={NAV_H}
+          aktivFül={aktivFül}
+          setAktivFül={setAktivFül}
+          user={user}
+          onLogout={handleLogout}
+        />
 
         <Box sx={{ height: NAV_H }} />
 
