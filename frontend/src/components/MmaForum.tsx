@@ -176,6 +176,8 @@ const NestedForumPage: React.FC = () => {
     }
   }
 
+  const token = localStorage.getItem("access_token");
+
   // Load categories on mount
   useEffect(() => {
     loadData(API_CATEGORIES, setCategories);
@@ -456,13 +458,18 @@ const NestedForumPage: React.FC = () => {
           setSaving(true);
           try {
             const url = categoryForm.id
-              ? `${API_CATEGORIES}${categoryForm.id}/`
+              ? `${API_CATEGORIES}/${categoryForm.id}/`
               : API_CATEGORIES;
 
             const res = await fetch(url, {
               method: categoryForm.id ? "PUT" : "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json" ,
+                "Authorization": `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcxNTkyMTAzLCJpYXQiOjE3NzE1OTAzMDMsImp0aSI6IjM2YzZhYWYwNWM3OTRkMzZiMzg1MDcxNWFkNDlhOWRhIiwidXNlcl9pZCI6IjEifQ._5Z3qb9ctdpN7qB-QWwwbN_zmjefZmeNozqGih8f8nY"}`
+              },
               body: JSON.stringify(categoryForm),
+              
+
             });
 
             if (!res.ok) console.error("Category save failed", res.status);
@@ -484,11 +491,14 @@ const NestedForumPage: React.FC = () => {
         onSave={async () => {
           setSaving(true);
           try {
-            const url = topicForm.id ? `${API_TOPICS}${topicForm.id}/` : API_TOPICS;
+            const url = topicForm.id ? `${API_TOPICS}/${topicForm.id}/` : API_TOPICS;
 
             const res = await fetch(url, {
               method: topicForm.id ? "PUT" : "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcxNTkyMTAzLCJpYXQiOjE3NzE1OTAzMDMsImp0aSI6IjM2YzZhYWYwNWM3OTRkMzZiMzg1MDcxNWFkNDlhOWRhIiwidXNlcl9pZCI6IjEifQ._5Z3qb9ctdpN7qB-QWwwbN_zmjefZmeNozqGih8f8nY"}`
+              },
               body: JSON.stringify(topicForm),
             });
 
@@ -511,11 +521,14 @@ const NestedForumPage: React.FC = () => {
         onSave={async () => {
           setSaving(true);
           try {
-            const url = postForm.id ? `${API_POSTS}${postForm.id}/` : API_POSTS;
+            const url = postForm.id ? `${API_POSTS}/${postForm.id}/` : API_POSTS;
 
             const res = await fetch(url, {
               method: postForm.id ? "PUT" : "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcxNTkyMTAzLCJpYXQiOjE3NzE1OTAzMDMsImp0aSI6IjM2YzZhYWYwNWM3OTRkMzZiMzg1MDcxNWFkNDlhOWRhIiwidXNlcl9pZCI6IjEifQ._5Z3qb9ctdpN7qB-QWwwbN_zmjefZmeNozqGih8f8nY"}`
+              },
               body: JSON.stringify(postForm),
             });
 
@@ -538,11 +551,14 @@ const NestedForumPage: React.FC = () => {
         onSave={async () => {
           setSaving(true);
           try {
-            const url = replyForm.id ? `${API_REPLIES}${replyForm.id}/` : API_REPLIES;
+            const url = replyForm.id ? `${API_REPLIES}/${replyForm.id}/` : API_REPLIES;
 
             const res = await fetch(url, {
               method: replyForm.id ? "PUT" : "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcxNTkyMTAzLCJpYXQiOjE3NzE1OTAzMDMsImp0aSI6IjM2YzZhYWYwNWM3OTRkMzZiMzg1MDcxNWFkNDlhOWRhIiwidXNlcl9pZCI6IjEifQ._5Z3qb9ctdpN7qB-QWwwbN_zmjefZmeNozqGih8f8nY"}`
+              },
               body: JSON.stringify(replyForm),
             });
 
@@ -567,7 +583,10 @@ const NestedForumPage: React.FC = () => {
           try {
             const res = await fetch(API_LIKES, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcxNTkyMTAzLCJpYXQiOjE3NzE1OTAzMDMsImp0aSI6IjM2YzZhYWYwNWM3OTRkMzZiMzg1MDcxNWFkNDlhOWRhIiwidXNlcl9pZCI6IjEifQ._5Z3qb9ctdpN7qB-QWwwbN_zmjefZmeNozqGih8f8nY"}`
+              },
               body: JSON.stringify(likeForm),
             });
 

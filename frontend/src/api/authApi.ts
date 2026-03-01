@@ -64,7 +64,7 @@ export async function fetchMe(): Promise<MeResponse> {
     throw new Error(data?.detail || "Not authenticated.");
   }
   return data as MeResponse;
-}
+} 
 
 export function logout() {
   clearAccessToken();
