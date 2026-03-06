@@ -19,6 +19,13 @@ const bodyFont = "var(--mma-body-font)";
  */
 const LINE_MS = 15000;
 
+// CSAK EZEK a háttérképek játszanak a Details fülön
+const UFC_DETAILS_BG = [
+  "http://localhost:8000/media/fighters/UFC_details_1.png",
+  "http://localhost:8000/media/fighters/UFC_details_2.png",
+  "http://localhost:8000/media/fighters/UFC_details_3.png",
+];
+
 export default function FighterDetails({
   fighter,
   mode = "preview",
@@ -66,7 +73,7 @@ function PreviewDetails({
   isAdmin: boolean;
   onUpdated?: (patch: Partial<Fighter>) => void;
 }) {
-  const kep = fighter.upload_image ?? fighter.details_cover ?? null;
+  const kep = fighter.upload_image ?? null;
 
   const szoveg =
     fighter.description ??
@@ -172,11 +179,6 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
     return () => window.clearTimeout(id);
   }, [fighter.id]);
 
-  const cover = useMemo(() => fighter.details_cover ?? fighter.upload_image ?? null, [
-    fighter.details_cover,
-    fighter.upload_image,
-  ]);
-
   const events: TimelineEvent[] = useMemo(() => parseBioLongToEvents(fighter.bio_long ?? ""), [
     fighter.bio_long,
   ]);
@@ -194,19 +196,6 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
         bgcolor: "#0b0b0b",
       }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: cover ? `url(${cover})` : "none",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          transform: stage === "intro" ? "scale(1.02)" : "scale(1.08)",
-          filter: stage === "intro" ? "blur(0px)" : "blur(12px)",
-          transition: "transform 900ms ease, filter 900ms ease",
-        }}
-      />
-
       <Box
         sx={{
           position: "absolute",
@@ -300,10 +289,7 @@ function TimelineCore({
       const topAbs = window.scrollY + rect.top;
       const height = rect.height;
 
-      // KÖZELEBB A VONAL MOZGASAHOZ: kisebb offset, jobban "koveti" a kukac
-      const focusOffset = window.innerHeight * 0.35;
-
-      // a target ne ugorjon tul gyorsan, maradjon finom
+      const focusOffset = window.innerHeight * 0.8;
       const target = topAbs + progress * height - focusOffset;
 
       window.scrollTo({ top: Math.max(0, target), behavior: "auto" });
@@ -328,11 +314,36 @@ function TimelineCore({
         mt: 2,
         position: "relative",
         borderRadius: 3,
-        bgcolor: "rgba(0,0,0,0.18)",
+        bgcolor: "rgba(0,0,0,0.06)",
         border: "1px solid rgba(255,255,255,0.08)",
         overflow: "hidden",
       }}
     >
+      {/* HATTER: KEPEK EGYMAS ALATT (NEM EGymasra), A TIMELINE MAGASSAGAHOZ KOTVE */}
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          opacity: 0.28,
+          pointerEvents: "none",
+        }}
+      >
+        {UFC_DETAILS_BG.map((src, i) => (
+          <Box
+            key={`${src}-${i}`}
+            sx={{
+              flex: 1,
+              backgroundImage: `url(${src})`,
+              backgroundRepeat: "no-repeat",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        ))}
+      </Box>
+
       <Box sx={{ position: "relative", px: { xs: 1, sm: 2 }, py: 10 }}>
         <Box
           className="mma-timeline-line"
@@ -344,7 +355,7 @@ function TimelineCore({
             width: 32,
             borderRadius: 999,
             bgcolor: "rgba(183,28,28,0.95)",
-            boxShadow: "0 0 52px rgba(183,28,28,0.26)",
+            boxShadow: "0 0 14px rgba(183,28,28,0.14)",
           }}
         />
 
@@ -366,10 +377,9 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
     fontWeight: 900,
     letterSpacing: 0.7,
     opacity: 0.97,
-    textShadow: "0 12px 26px rgba(0,0,0,0.55)",
+    textShadow: "0 10px 20px rgba(0,0,0,0.45)",
   } as const;
 
-  // DÁTUM ugyanaz a stílus, mint a címke
   const dateSx = {
     ...titleSx,
     fontSize: 15,
@@ -385,7 +395,6 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         py: { xs: 16, md: 28 },
       }}
     >
-      {/* LEFT: itt mindig legyen valami desktopon (vagy date vagy title) */}
       <Box sx={{ display: { xs: "none", md: "block" }, pr: 4, textAlign: "right" }}>
         {titleOnLeft ? (
           <Typography sx={titleSx}>{ev.title}</Typography>
@@ -394,7 +403,6 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         )}
       </Box>
 
-      {/* CENTER: dot */}
       <Box sx={{ position: "relative", height: 40 }}>
         <Tooltip
           arrow
@@ -440,7 +448,7 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
               borderRadius: 999,
               bgcolor: "rgba(255,255,255,0.92)",
               transform: "translate(-50%, -50%)",
-              boxShadow: "0 0 0 18px rgba(183,28,28,0.26), 0 0 60px rgba(183,28,28,0.18)",
+              boxShadow: "0 0 0 8px rgba(183,28,28,0.16), 0 0 14px rgba(183,28,28,0.10)",
               transition: "transform 140ms ease",
               "&:hover": { transform: "translate(-50%, -50%) scale(1.06)" },
             }}
@@ -451,7 +459,6 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         </Tooltip>
       </Box>
 
-      {/* RIGHT: desktopon a masik oldal (date vagy title) */}
       <Box sx={{ display: { xs: "none", md: "block" }, pl: 4, textAlign: "left" }}>
         {!titleOnLeft ? (
           <Typography sx={titleSx}>{ev.title}</Typography>
@@ -460,7 +467,6 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         )}
       </Box>
 
-      {/* MOBILE: itt egy oszlopos, legyen title + date egymas alatt */}
       <Box sx={{ display: { xs: "block", md: "none" } }}>
         <Typography sx={titleSx}>{ev.title}</Typography>
         <Typography sx={{ ...dateSx, mt: 0.7 }}>{ev.date}</Typography>

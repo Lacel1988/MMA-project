@@ -17,11 +17,11 @@ type Metrics = {
 };
 
 type Props = {
-  title: string;          // pl "Fighter A" vagy a név
-  fighterName: string;    // a legend helyett
+  title: string;          
+  fighterName: string;    
   metrics?: Metrics | null;
   last: number;
-  color?: string;         // pl piros/kék
+  color?: string;         
 };
 
 function clamp(v: number, max: number) {
@@ -106,7 +106,7 @@ export default function UfcRadarChart({
         color: "white",
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 900 }}>
+      <Typography variant="h6" sx={{ fontWeight: 900, }}>
         {title} Radar
       </Typography>
       <Typography sx={{ opacity: 0.75, mb: 2 }}>
@@ -123,13 +123,14 @@ export default function UfcRadarChart({
             <PolarGrid stroke="rgba(255,255,255,0.18)" />
             <PolarAngleAxis
               dataKey="stat"
-              tick={{ fill: "rgba(255,255,255,0.85)", fontSize: 12 }}
+              tick={{ fill: "rgba(255,255,255,1.55)", 
+                fontSize: 8 }}
             />
 
             <Tooltip
               contentStyle={{
                 background: "rgba(20,20,20,0.95)",
-                border: "1px solid rgba(255,255,255,0.15)",
+                border: "1px solid rgba(244, 11, 11, 0.15)",
                 color: "white",
               }}
               formatter={(val: any, _name: any, props: any) => {
@@ -146,9 +147,9 @@ export default function UfcRadarChart({
               dataKey="value"
               stroke={color}
               fill={color}
-              fillOpacity={0.22}
+              fillOpacity={0.35}
               strokeWidth={3}
-              dot={{ r: 2 }}
+              dot={{ r: 3 }}
               animationDuration={0}
             />
           </RadarChart>

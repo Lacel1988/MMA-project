@@ -35,6 +35,31 @@ function StatRow({
   );
 }
 
+function formatHeight(inches?: number | null) {
+  if (inches == null) return "-";
+  const v = Math.round(Number(inches));
+  if (!Number.isFinite(v) || v <= 0) return "-";
+  const ft = Math.floor(v / 12);
+  const inch = v % 12;
+  return `${ft}'${inch}"`;
+}
+
+function formatWeight(lbs?: number | null) {
+  if (lbs == null) return "-";
+  const v = Number(lbs);
+  if (!Number.isFinite(v) || v <= 0) return "-";
+  // ha integer, ne írjunk .00-t
+  const pretty = Number.isInteger(v) ? String(v) : v.toFixed(1);
+  return `${pretty} lbs`;
+}
+
+function formatReach(inches?: number | null) {
+  if (inches == null) return "-";
+  const v = Math.round(Number(inches));
+  if (!Number.isFinite(v) || v <= 0) return "-";
+  return `${v}"`;
+}
+
 export default function TaleOfTheTape({
   left,
   right,
@@ -52,7 +77,7 @@ export default function TaleOfTheTape({
         p: 2,
         color: "white",
         width: "100%",
-        maxwidth: 1100,
+        maxWidth: 1100, // <-- maxwidth helyett maxWidth
         mx: "auto",
       }}
     >
@@ -62,12 +87,28 @@ export default function TaleOfTheTape({
 
       <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.10)" }} />
 
-      <StatRow label="Division" left={left?.division.name} right={right?.division.name} />
+      <StatRow
+        label="Division"
+        left={left?.division?.name}
+        right={right?.division?.name}
+      />
       <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
 
-      <StatRow label="Height" left={left?.height} right={right?.height} />
-      <StatRow label="Weight" left={left?.weight} right={right?.weight} />
-      <StatRow label="Reach" left={left?.reach} right={right?.reach} />
+      <StatRow
+        label="Height"
+        left={formatHeight((left as any)?.height_in)}
+        right={formatHeight((right as any)?.height_in)}
+      />
+      <StatRow
+        label="Weight"
+        left={formatWeight((left as any)?.weight_lbs)}
+        right={formatWeight((right as any)?.weight_lbs)}
+      />
+      <StatRow
+        label="Reach"
+        left={formatReach((left as any)?.reach_in)}
+        right={formatReach((right as any)?.reach_in)}
+      />
     </Paper>
   );
 }

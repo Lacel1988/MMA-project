@@ -1,4 +1,9 @@
-import { apiFetch, setAccessToken, clearAccessToken } from "./client";
+import {
+  apiFetch,
+  setAccessToken,
+  setRefreshToken,
+  clearTokens,
+} from "./client";
 
 const API_URL = "http://127.0.0.1:8000/api";
 
@@ -24,14 +29,13 @@ export async function login(username: string, password: string): Promise<MeRespo
 
   const data = (await res.json().catch(() => ({}))) as Partial<TokenResponse & { detail?: string }>;
 
-  if (!res.ok || !data.access) {
+  if (!res.ok || !data.access || !data.refresh) {
     throw new Error(data.detail || "Login failed.");
   }
 
-  // kulcs: access_token
   setAccessToken(data.access);
+  setRefreshToken(data.refresh);
 
-  // utána me-t kérjük le (már Bearerrel megy)
   return fetchMe();
 }
 
@@ -63,9 +67,22 @@ export async function fetchMe(): Promise<MeResponse> {
   if (!res.ok) {
     throw new Error(data?.detail || "Not authenticated.");
   }
+
   return data as MeResponse;
 }
 
+export function hasAccessToken(): boolean {
+  return !!localStorage.getItem("access_token");
+}
+
+export function getAccessToken(): string | null {
+  return localStorage.getItem("access_token");
+}
+
+export function getRefreshToken(): string | null {
+  return localStorage.getItem("refresh_token");
+}
+
 export function logout() {
-  clearAccessToken();
+  clearTokens();
 }

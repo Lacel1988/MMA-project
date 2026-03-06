@@ -17,14 +17,12 @@ import {
   TableContainer,
   Paper,
   Stack,
+  Alert,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 
-type Category = {
-  id: number;
-  name: string;
-  description: string | null;
-};
+import type { Category } from "../api/forumApi";
+import { listCategories, createCategory, updateCategory, deleteCategory } from "../api/forumApi";
 
 type CategoryFormState = {
   id?: number;
@@ -32,30 +30,31 @@ type CategoryFormState = {
   description: string;
 };
 
-const API_BASE = "/api/categories/";
-
 const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+
   const [openDialog, setOpenDialog] = useState(false);
   const [form, setForm] = useState<CategoryFormState>({ name: "", description: "" });
   const [saving, setSaving] = useState(false);
 
-  const fetchCategories = async () => {
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
     try {
+      setError(null);
       setLoading(true);
-      const res = await fetch(API_BASE);
-      const data = await res.json();
+      const data = await listCategories();
       setCategories(data);
-    } catch (err) {
-      console.error("Failed to fetch categories", err);
+    } catch (e: any) {
+      setError(e?.message || "Failed to fetch categories.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
-    fetchCategories();
+    refresh();
   }, []);
 
   const handleOpenCreate = () => {
@@ -83,59 +82,53 @@ const CategoriesPage: React.FC = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const isEdit = !!form.id;
-      const url = isEdit ? `${API_BASE}${form.id}/` : API_BASE;
-      const method = isEdit ? "PUT" : "POST";
+      setError(null);
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: form.name,
-          description: form.description || null,
-        }),
-      });
+      const payload = {
+        name: form.name.trim(),
+        description: form.description.trim() ? form.description.trim() : null,
+      };
 
-      if (!res.ok) {
-        console.error("Save failed", await res.text());
-        return;
+      if (form.id) {
+        await updateCategory(form.id, payload);
+      } else {
+        await createCategory(payload);
       }
 
-      await fetchCategories();
+      await refresh();
       setOpenDialog(false);
-    } catch (err) {
-      console.error("Error saving category", err);
+    } catch (e: any) {
+      setError(e?.message || "Save failed.");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    if (!window.confirm("Biztos törlöd ezt a kategóriát?")) return;
     try {
-      const res = await fetch(`${API_BASE}${id}/`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        console.error("Delete failed", await res.text());
-        return;
-      }
+      setError(null);
+      await deleteCategory(id);
       setCategories((prev) => prev.filter((c) => c.id !== id));
-    } catch (err) {
-      console.error("Error deleting category", err);
+    } catch (e: any) {
+      setError(e?.message || "Delete failed.");
     }
   };
 
   return (
     <Box p={3}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">Categories</Typography>
-        <Button variant="contained" color="primary" onClick={handleOpenCreate}>
+        <Button variant="contained" onClick={handleOpenCreate}>
           New category
         </Button>
       </Stack>
+
+      {error && (
+        <Box mb={2}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      )}
 
       {loading ? (
         <Typography>Loading...</Typography>
@@ -150,6 +143,7 @@ const CategoriesPage: React.FC = () => {
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {categories.map((cat) => (
                 <TableRow key={cat.id}>
@@ -160,16 +154,13 @@ const CategoriesPage: React.FC = () => {
                     <IconButton onClick={() => handleOpenEdit(cat)} size="small">
                       <Edit />
                     </IconButton>
-                    <IconButton
-                      onClick={() => handleDelete(cat.id)}
-                      size="small"
-                      color="error"
-                    >
+                    <IconButton onClick={() => handleDelete(cat.id)} size="small" color="error">
                       <Delete />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
+
               {categories.length === 0 && !loading && (
                 <TableRow>
                   <TableCell colSpan={4}>
@@ -183,9 +174,7 @@ const CategoriesPage: React.FC = () => {
       )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>
-          {form.id ? "Edit category" : "Create new category"}
-        </DialogTitle>
+        <DialogTitle>{form.id ? "Edit category" : "Create new category"}</DialogTitle>
         <DialogContent>
           <Box mt={1} display="flex" flexDirection="column" gap={2}>
             <TextField
@@ -207,11 +196,7 @@ const CategoriesPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            onClick={handleSave}
-            variant="contained"
-            disabled={saving || !form.name.trim()}
-          >
+          <Button onClick={handleSave} variant="contained" disabled={saving || !form.name.trim()}>
             Save
           </Button>
         </DialogActions>

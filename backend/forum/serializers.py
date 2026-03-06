@@ -16,6 +16,9 @@ class TopicSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
+    created_by = serializers.PrimaryKeyRelatedField(read_only=True)
+    created_by_username = serializers.CharField(source="created_by.username", read_only=True)
+
     class Meta:
         model = Topic
         fields = [
@@ -25,12 +28,14 @@ class TopicSerializer(serializers.ModelSerializer):
             "category",
             "category_id",
             "created_by",
+            "created_by_username",
             "created_at",
         ]
         read_only_fields = ["created_by", "created_at"]
 
 
 class ReplySerializer(serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
     author_username = serializers.CharField(source="author.username", read_only=True)
 
     class Meta:
@@ -47,6 +52,7 @@ class ReplySerializer(serializers.ModelSerializer):
 
 
 class PostLikeSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     user_username = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
@@ -62,7 +68,9 @@ class PostLikeSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
     author_username = serializers.CharField(source="author.username", read_only=True)
+
     replies = ReplySerializer(many=True, read_only=True)
     likes_count = serializers.IntegerField(source="likes.count", read_only=True)
 

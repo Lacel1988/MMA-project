@@ -32,9 +32,9 @@ class Fighter(models.Model):
         ],
     )
 
-    weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    height = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    reach = models.PositiveSmallIntegerField(null=True, blank=True)
+    weight_lbs = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    height_in = models.PositiveSmallIntegerField(null=True, blank=True)
+    reach_in = models.PositiveSmallIntegerField(null=True, blank=True)      
 
     wins = models.PositiveIntegerField(default=0)
     losses = models.PositiveIntegerField(default=0)
@@ -48,11 +48,6 @@ class Fighter(models.Model):
 
     upload_image = models.ImageField(
         upload_to="fighters/images/",
-        null=True,
-        blank=True,
-    )
-    details_cover = models.ImageField(
-        upload_to="fighters/details/",
         null=True,
         blank=True,
     )

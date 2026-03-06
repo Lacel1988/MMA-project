@@ -1,62 +1,56 @@
 from rest_framework import serializers
-from django.core.exceptions import ValidationError as DjangoValidationError
-
-from ..models import Fighter, Division
-from ..services.ufcstats_registry import is_known_fighter
+from ..models import Division, Fighter
 
 
 class DivisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Division
-        fields = "__all__"
+        fields = ["id", "name", "min_weight", "max_weight"]
 
 
 class FighterSerializer(serializers.ModelSerializer):
     division = DivisionSerializer(read_only=True)
 
-    division_id = serializers.PrimaryKeyRelatedField(
-        queryset=Division.objects.all(),
-        source="division",
-        write_only=True,
-        required=False,
-        allow_null=True,
-    )
+    upload_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Fighter
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "division",
+            "nickname",
+            "age",
 
-    def validate(self, attrs):
-        name = " ".join((attrs.get("name") or "").strip().split())
-        url = attrs.get("ufcstats_url") or None
+            "wins",
+            "losses",
+            "draw",
 
-        if not name:
-            raise serializers.ValidationError({"name": "Name cannot be empty."})
+            # ha nálad már ezek az új mezők vannak
+            "height_in",
+            "weight_lbs",
+            "reach_in",
 
-        # URL-val együtt validálunk, ha van
-        if not is_known_fighter(name, url):
-            raise serializers.ValidationError({"name": "Fighter name is not present in UFCStats CSV reference."})
+            "description",
+            "bio_long",
+            "ufcstats_url",
 
-        attrs["name"] = name
-        return attrs
+            # eredeti image field (path)
+            "upload_image",
 
-    def create(self, validated_data):
-        obj = Fighter(**validated_data)
-        try:
-            obj.full_clean()
-        except DjangoValidationError as e:
-            raise serializers.ValidationError(e.message_dict)
-        obj.save()
-        return obj
+            # uj fix URL mezok
+            "upload_image_url",
+        ]
 
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+    def _abs(self, request, rel_url: str):
+        if not rel_url:
+            return None
+        if request is None:
+            return rel_url
+        return request.build_absolute_uri(rel_url)
 
-        try:
-            instance.full_clean()
-        except DjangoValidationError as e:
-            raise serializers.ValidationError(e.message_dict)
-
-        instance.save()
-        return instance
+    def get_upload_image_url(self, obj: Fighter):
+        request = self.context.get("request")
+        if obj.upload_image and hasattr(obj.upload_image, "url"):
+            return self._abs(request, obj.upload_image.url)
+        return None

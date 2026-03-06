@@ -29,8 +29,8 @@ export default function FighterCompareCard({ fighter, title }: Props) {
           <Box sx={{ mt: 1, display: "flex", gap: 2, alignItems: "center" }}>
             <Box
               sx={{
-                width: 240,
-                height: 480,
+                width : "200px",
+                aspectRatio: "1 / 1",
                 borderRadius: 2,
                 bgcolor: "#0c0c0c",
                 border: "1px solid rgba(255,255,255,0.08)",

@@ -13,7 +13,6 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
   const [descDraft, setDescDraft] = useState("");
   const [bioDraft, setBioDraft] = useState("");
 
-  // stat draftok stringként (hogy lehessen törölni / gépelni)
   const [winsDraft, setWinsDraft] = useState("0");
   const [lossesDraft, setLossesDraft] = useState("0");
   const [drawDraft, setDrawDraft] = useState("0");
@@ -47,11 +46,9 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
   }
 
   function toIntSafe(s: string): number | null {
-    // engedjük az üres stringet gépelés közben, de mentéskor már ne
     if (s.trim() === "") return null;
     const n = Number(s);
     if (!Number.isFinite(n)) return null;
-    // UFC statoknál nem kell tizedes
     return Math.max(0, Math.trunc(n));
   }
 
@@ -66,7 +63,6 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
     if ((descDraft ?? "") !== (fighter.description ?? "")) patch.description = descDraft;
     if ((bioDraft ?? "") !== (fighter.bio_long ?? "")) patch.bio_long = bioDraft;
 
-    // statok validálása
     const winsInt = toIntSafe(winsDraft);
     const lossesInt = toIntSafe(lossesDraft);
     const drawInt = toIntSafe(drawDraft);
@@ -177,7 +173,6 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
         sx={fieldSx}
       />
 
-      {/* STATOK */}
       <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1 }}>
         <TextField
           label="Wins"

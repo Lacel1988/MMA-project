@@ -9,21 +9,34 @@ class DivisionAdmin(admin.ModelAdmin):
 
 @admin.register(Fighter)
 class FighterAdmin(admin.ModelAdmin):
-    list_display = ("name", "division", "reach", "wins", "losses", "draw")
+    list_display = (
+        "name",
+        "division",
+        "height_in",
+        "reach_in",
+        "weight_lbs",
+        "wins",
+        "losses",
+        "draw",
+    )
 
     fields = (
         "name",
         "division",
         "nickname",
         "age",
-        "weight",
-        "height",
-        "reach",
+
+        # Imperial base values (toggle-friendly)
+        "weight_lbs",
+        "height_in",
+        "reach_in",
+
         "upload_image",
-        "details_cover",
+
         "wins",
         "losses",
         "draw",
+
         "description",
         "bio_long",
     )
