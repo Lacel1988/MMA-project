@@ -145,10 +145,6 @@ function PreviewDetails({
             label={`Record: ${fighter.wins}-${fighter.losses}-${fighter.draw}`}
             sx={{ bgcolor: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: bodyFont }}
           />
-          <Chip
-            label={`Reach: ${fighter.reach ?? "-"}`}
-            sx={{ bgcolor: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: bodyFont }}
-          />
         </Box>
 
         <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.10)" }} />
