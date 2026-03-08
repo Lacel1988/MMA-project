@@ -21,8 +21,10 @@ import {
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 
-import type { Category } from "../api/forumApi";
-import { listCategories, createCategory, updateCategory, deleteCategory } from "../api/forumApi";
+//import type { Category } from "../api/forumApi";
+import type { Category, Topic, Reply, Post, Like } from "../api/forumApi";
+import { listCategories, createCategory, updateCategory, deleteCategory, listTopics, getTopic, createTopic, updateTopic, deleteTopic, listPosts, getPost, createPost, updatePost, deletePost, listReplies, createReply, updateReply, deleteReply, likePost, unlikePost, listPostLikes } from "../api/forumApi";
+//import { listCategories, createCategory, updateCategory, deleteCategory } from "../api/forumApi";
 
 type CategoryFormState = {
   id?: number;
