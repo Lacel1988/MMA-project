@@ -1,50 +1,63 @@
-import React from "react";
 import { styled } from "@mui/material/styles";
-import Switch from "@mui/material/Switch";
+import Switch, { type SwitchProps } from "@mui/material/Switch";
 
-import euFlagUrl from "../assets/eu.svg";
-import usFlagUrl from "../assets/us.svg";
-
-type FlagSwitchProps = Omit<React.Component, "icon" | "checkedIcon">;
-
-const StyledSwitch = styled((props: FlagSwitchProps) => (
+const StyledSwitch = styled((props: SwitchProps) => (
   <Switch
-    focusVisibleClassName=".Mui-focusVisible"
+    focusVisibleClassName="Mui-focusVisible"
     disableRipple
     {...props}
   />
 ))(({ theme }) => ({
-  width: 62,
-  height: 34,
-  padding: 7,
+  width: 54,
+  height: 30,
+  padding: 4,
+  display: "flex",
+  alignItems: "center",
+
   "& .MuiSwitch-switchBase": {
     padding: 0,
     margin: 1,
-    transition: theme.transitions.create(["transform"], {
-      duration: theme.transitions.duration.shortest,
-    }),
+    transitionDuration: "220ms",
+
     "&.Mui-checked": {
-      transform: "translateX(28px)",
+      transform: "translateX(24px)",
+      color: "#fff",
+
+      "& + .MuiSwitch-track": {
+        backgroundColor: "rgba(183, 28, 28, 0.34)",
+        borderColor: "rgba(255,255,255,0.15)",
+        opacity: 1,
+      },
+
       "& .MuiSwitch-thumb": {
-        backgroundImage: `url(${usFlagUrl})`,
+        backgroundColor: "#c62828",
       },
     },
+
+    "&.Mui-focusVisible .MuiSwitch-thumb": {
+      boxShadow: "0 0 0 5px rgba(183, 28, 28, 0.22)",
+    },
   },
+
   "& .MuiSwitch-thumb": {
-    width: 30,
-    height: 30,
+    boxSizing: "border-box",
+    width: 25,
+    height: 25,
     borderRadius: "50%",
-    backgroundColor: "#2b2b2b",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundImage: `url(${euFlagUrl})`,
-    boxShadow: "0 2px 6px rgba(0,0,0,0.5)",
+    backgroundColor: "#111",
+    border: "2px solid rgba(255,255,255,0.16)",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.42)",
   },
+
   "& .MuiSwitch-track": {
-    borderRadius: 34 / 2,
+    borderRadius: 999,
     opacity: 1,
-    backgroundColor: "#3a3a3a",
-    boxShadow: "inset 0 0 6px rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    boxSizing: "border-box",
+    transition: theme.transitions.create(["background-color", "border-color"], {
+      duration: 220,
+    }),
   },
 }));
 

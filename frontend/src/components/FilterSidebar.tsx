@@ -31,9 +31,6 @@ type Props = {
 
   title?: string;
   navHeight?: number;
-
-  // Desktopon "persistent" (tolja a layoutot), mobilon "temporary" (rányílik)
-  variant?: "persistent" | "temporary";
 };
 
 export default function FilterSidebar({
@@ -46,7 +43,6 @@ export default function FilterSidebar({
   setSearch,
   title = "Division filter",
   navHeight = 64,
-  variant = "temporary",
 }: Props) {
   const drawerWidth = 360;
 
@@ -55,22 +51,24 @@ export default function FilterSidebar({
       anchor="left"
       open={open}
       onClose={onClose}
-      variant={variant}
+      variant="temporary"
+      hideBackdrop
       ModalProps={{
         keepMounted: true,
-        // FONTOS: ne lockolja az egész oldalt scrollban
         disableScrollLock: true,
       }}
-      // temporary-nél se sötétítsen
-      hideBackdrop={variant === "temporary"}
       PaperProps={{
         sx: {
           width: { xs: "86vw", sm: drawerWidth },
           maxWidth: 420,
+          height: `calc(100vh - ${navHeight}px)`,
+          mt: `${navHeight}px`,
           bgcolor: "#ffffff",
           color: "#111",
           borderRight: "1px solid rgba(0,0,0,0.10)",
           overflow: "hidden",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+          zIndex: 1600,
         },
       }}
     >
@@ -111,8 +109,7 @@ export default function FilterSidebar({
             px: 2,
             py: 2,
             overflowY: "auto",
-            // ez a filter saját scrollja
-            maxHeight: `calc(100vh - ${navHeight}px)`,
+            height: "100%",
           }}
         >
           <Typography
@@ -190,7 +187,10 @@ export default function FilterSidebar({
               sx={{
                 borderRadius: 2,
                 mb: 0.5,
-                bgcolor: aktivDivisionId === null ? "rgba(183,28,28,0.10)" : "transparent",
+                bgcolor:
+                  aktivDivisionId === null
+                    ? "rgba(183,28,28,0.10)"
+                    : "transparent",
                 border:
                   aktivDivisionId === null
                     ? "1px solid rgba(183,28,28,0.35)"
@@ -217,14 +217,19 @@ export default function FilterSidebar({
                     borderRadius: 2,
                     mb: 0.5,
                     bgcolor: aktiv ? "rgba(183,28,28,0.10)" : "transparent",
-                    border: aktiv ? "1px solid rgba(183,28,28,0.35)" : "1px solid rgba(0,0,0,0.10)",
+                    border: aktiv
+                      ? "1px solid rgba(183,28,28,0.35)"
+                      : "1px solid rgba(0,0,0,0.10)",
                     "&:hover": { bgcolor: "rgba(0,0,0,0.06)" },
                   }}
                 >
                   <ListItemText
                     primary={d.name}
                     primaryTypographyProps={{
-                      sx: { fontWeight: aktiv ? 950 : 800, fontFamily: "var(--mma-title-font)" },
+                      sx: {
+                        fontWeight: aktiv ? 950 : 800,
+                        fontFamily: "var(--mma-title-font)",
+                      },
                     }}
                   />
                 </ListItemButton>

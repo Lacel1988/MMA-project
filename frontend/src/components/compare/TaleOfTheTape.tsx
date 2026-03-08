@@ -1,5 +1,6 @@
 import { Box, Divider, Paper, Typography } from "@mui/material";
 import type { Fighter } from "../../types";
+import { useUnit } from "../../context/UnitContext";
 
 function StatRow({
   label,
@@ -35,29 +36,49 @@ function StatRow({
   );
 }
 
-function formatHeight(inches?: number | null) {
-  if (inches == null) return "-";
-  const v = Math.round(Number(inches));
-  if (!Number.isFinite(v) || v <= 0) return "-";
-  const ft = Math.floor(v / 12);
-  const inch = v % 12;
-  return `${ft}'${inch}"`;
+function safeNumber(value?: number | null) {
+  const v = Number(value);
+  return Number.isFinite(v) && v > 0 ? v : null;
 }
 
-function formatWeight(lbs?: number | null) {
+function formatHeight(valueInInches?: number | null, unit: "US" | "EU" = "US") {
+  const inches = safeNumber(valueInInches);
+  if (inches == null) return "-";
+
+  if (unit === "US") {
+    const rounded = Math.round(inches);
+    const ft = Math.floor(rounded / 12);
+    const inch = rounded % 12;
+    return `${ft}'${inch}"`;
+  }
+
+  const cm = Math.round(inches * 2.54);
+  return `${cm} cm`;
+}
+
+function formatWeight(valueInLbs?: number | null, unit: "US" | "EU" = "US") {
+  const lbs = safeNumber(valueInLbs);
   if (lbs == null) return "-";
-  const v = Number(lbs);
-  if (!Number.isFinite(v) || v <= 0) return "-";
-  // ha integer, ne írjunk .00-t
-  const pretty = Number.isInteger(v) ? String(v) : v.toFixed(1);
-  return `${pretty} lbs`;
+
+  if (unit === "US") {
+    const pretty = Number.isInteger(lbs) ? String(lbs) : lbs.toFixed(1);
+    return `${pretty} lbs`;
+  }
+
+  const kg = lbs * 0.45359237;
+  return `${kg.toFixed(1)} kg`;
 }
 
-function formatReach(inches?: number | null) {
+function formatReach(valueInInches?: number | null, unit: "US" | "EU" = "US") {
+  const inches = safeNumber(valueInInches);
   if (inches == null) return "-";
-  const v = Math.round(Number(inches));
-  if (!Number.isFinite(v) || v <= 0) return "-";
-  return `${v}"`;
+
+  if (unit === "US") {
+    return `${Math.round(inches)}"`;
+  }
+
+  const cm = Math.round(inches * 2.54);
+  return `${cm} cm`;
 }
 
 export default function TaleOfTheTape({
@@ -67,6 +88,8 @@ export default function TaleOfTheTape({
   left: Fighter | null;
   right: Fighter | null;
 }) {
+  const { unit } = useUnit();
+
   return (
     <Paper
       elevation={0}
@@ -77,7 +100,7 @@ export default function TaleOfTheTape({
         p: 2,
         color: "white",
         width: "100%",
-        maxWidth: 1100, // <-- maxwidth helyett maxWidth
+        maxWidth: 1100,
         mx: "auto",
       }}
     >
@@ -96,18 +119,18 @@ export default function TaleOfTheTape({
 
       <StatRow
         label="Height"
-        left={formatHeight((left as any)?.height_in)}
-        right={formatHeight((right as any)?.height_in)}
+        left={formatHeight((left as any)?.height_in, unit)}
+        right={formatHeight((right as any)?.height_in, unit)}
       />
       <StatRow
         label="Weight"
-        left={formatWeight((left as any)?.weight_lbs)}
-        right={formatWeight((right as any)?.weight_lbs)}
+        left={formatWeight((left as any)?.weight_lbs, unit)}
+        right={formatWeight((right as any)?.weight_lbs, unit)}
       />
       <StatRow
         label="Reach"
-        left={formatReach((left as any)?.reach_in)}
-        right={formatReach((right as any)?.reach_in)}
+        left={formatReach((left as any)?.reach_in, unit)}
+        right={formatReach((right as any)?.reach_in, unit)}
       />
     </Paper>
   );

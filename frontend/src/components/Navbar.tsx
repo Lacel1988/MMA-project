@@ -1,7 +1,8 @@
 import { AppBar, Toolbar, Typography, Button, Box, Chip, Container } from "@mui/material";
 import type { MeResponse } from "../api/authApi";
+import UnitSwitch from "./UnitSwitch";
 
-type Ful = "Fighters" | "Details" | "Compare" | "Auth"  | "Forum";
+type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
 export default function Navbar({
   aktivFül,
@@ -16,6 +17,8 @@ export default function Navbar({
   onLogout: () => void;
   height?: number;
 }) {
+  const showUnitSwitch = aktivFül === "Fighters" || aktivFül === "Compare";
+
   const gomb = (felirat: Ful) => (
     <Button
       key={felirat}
@@ -62,11 +65,13 @@ export default function Navbar({
             gap: 2,
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" }}>
             MMA <span style={{ color: "#b71c1c" }}>PROJECT</span>
           </Typography>
 
           <Box sx={{ flexGrow: 1 }} />
+
+          {showUnitSwitch ? <UnitSwitch /> : null}
 
           {user ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -96,7 +101,6 @@ export default function Navbar({
             {gomb("Compare")}
             {gomb("Forum")}
             {gomb("Auth")}
-
           </Box>
         </Container>
       </Toolbar>

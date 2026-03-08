@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
-export type UnitSystem = "EU" | "US";
+export type UnitSystem = "US" | "EU";
 
 type UnitContextValue = {
   unit: UnitSystem;
@@ -9,25 +9,39 @@ type UnitContextValue = {
 
 const UnitContext = createContext<UnitContextValue | undefined>(undefined);
 
-export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function UnitProvider({ children }: { children: React.ReactNode }) {
   const [unit, setUnit] = useState<UnitSystem>(() => {
     const saved = localStorage.getItem("unitSystem");
-    return (saved as UnitSystem) || "EU";
+    return saved === "EU" || saved === "US" ? saved : "US";
   });
 
-  const toggleUnit = () => {
-    const next = unit === "EU" ? "US" : "EU";
+  function toggleUnit() {
+    const next = unit === "US" ? "EU" : "US";
     setUnit(next);
     localStorage.setItem("unitSystem", next);
-  };
+  }
 
-  const value = useMemo(() => ({ unit, toggleUnit }), [unit]);
+  const value = useMemo(
+    () => ({
+      unit,
+      toggleUnit,
+    }),
+    [unit]
+  );
 
-  return <UnitContext.Provider value={value}>{children}</UnitContext.Provider>;
-};
+  return (
+    <UnitContext.Provider value={value}>
+      {children}
+    </UnitContext.Provider>
+  );
+}
 
-export const useUnit = () => {
+export function useUnit() {
   const ctx = useContext(UnitContext);
-  if (!ctx) throw new Error("useUnit must be used within UnitProvider");
+
+  if (!ctx) {
+    throw new Error("useUnit must be used within UnitProvider");
+  }
+
   return ctx;
-};
+}

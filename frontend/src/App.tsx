@@ -39,9 +39,7 @@ type Division = {
 const PROTECTED_TABS: Ful[] = ["Fighters", "Details", "Compare", "Forum"];
 
 export default function App() {
-
   const NAV_H = 64;
-  const drawerWidth = 360;
 
   const isDesktop = useMediaQuery("(min-width:1200px)");
 
@@ -64,16 +62,12 @@ export default function App() {
   const [aktivDivisionId, setAktivDivisionId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
 
-  // AUTH INIT + REFRESH
   useEffect(() => {
-
     async function initAuth() {
-
       const access = localStorage.getItem("access_token");
       const refresh = getRefreshToken();
 
       try {
-
         if (!access && refresh) {
           await tryRefreshAccessToken();
         }
@@ -82,53 +76,39 @@ export default function App() {
 
         setUser(me);
         setAktivFül("Fighters");
-
       } catch {
-
         logout();
         setUser(null);
         setAktivFül("Auth");
-
       }
-
     }
 
     initAuth();
-
   }, []);
 
-  // fighters betöltése
   useEffect(() => {
-
     fetch(`${API_URL}/fighters/`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to retrieve the data.");
         return res.json();
       })
       .then((data: Fighter[]) => {
-
         setFighters(data);
 
         setKivalasztott(
           (prev) => prev ?? (data.length > 0 ? data[0] : null)
         );
-
       })
       .catch((err) => setHiba(err.message));
-
   }, []);
 
-  // protected tab guard
   useEffect(() => {
-
     if (!isAuthenticated && PROTECTED_TABS.includes(aktivFül)) {
       setAktivFül("Auth");
     }
-
   }, [isAuthenticated, aktivFül]);
 
   function handleLogout() {
-
     logout();
 
     setUser(null);
@@ -138,46 +118,37 @@ export default function App() {
     setRight(null);
 
     setFilterOpen(false);
-
   }
 
   function handleTabChange(nextTab: Ful) {
-
     if (!isAuthenticated && PROTECTED_TABS.includes(nextTab)) {
       setAktivFül("Auth");
       return;
     }
 
     setAktivFül(nextTab);
-
   }
 
   const divisions: Division[] = useMemo(() => {
-
     const map = new Map<number, Division>();
 
     for (const f of fighters as any[]) {
-
       const d = f?.division;
 
       if (d && typeof d?.id === "number" && typeof d?.name === "string") {
         map.set(d.id, { id: d.id, name: d.name });
       }
-
     }
 
     return Array.from(map.values()).sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-
   }, [fighters]);
 
   const filteredFighters = useMemo(() => {
-
     const q = search.trim().toLowerCase();
 
     return fighters.filter((f) => {
-
       const okDiv =
         aktivDivisionId === null
           ? true
@@ -191,20 +162,15 @@ export default function App() {
       const nick = ((f as any).nickname ?? "").toString().toLowerCase();
 
       return name.includes(q) || nick.includes(q);
-
     });
-
   }, [fighters, aktivDivisionId, search]);
 
   useEffect(() => {
-
     if (aktivFül !== "Fighters" && aktivFül !== "Details") return;
 
     if (!kivalasztott) {
-
       setKivalasztott(filteredFighters[0] ?? null);
       return;
-
     }
 
     const exists = filteredFighters.some(
@@ -212,26 +178,15 @@ export default function App() {
     );
 
     if (!exists) setKivalasztott(filteredFighters[0] ?? null);
-
-  }, [filteredFighters, aktivFül]);
-
-  const pageLeftPadding =
-    aktivFül === "Fighters" && isDesktop && filterOpen
-      ? drawerWidth
-      : 0;
+  }, [filteredFighters, aktivFül, kivalasztott]);
 
   const tartalom = hiba ? (
-
     <Typography sx={{ color: "#ff6b6b" }}>
       Error: {hiba}
     </Typography>
-
   ) : (
-
     <>
-
       {aktivFül === "Auth" && (
-
         <Box
           sx={{
             display: "grid",
@@ -241,9 +196,7 @@ export default function App() {
             minHeight: { lg: `calc(100vh - 48px)` },
           }}
         >
-
           <Box>
-
             <Typography
               variant="h4"
               sx={{ mb: 2, color: "white" }}
@@ -253,13 +206,10 @@ export default function App() {
 
             <AuthPanel
               onLoginSuccess={(me) => {
-
                 setUser(me);
                 setAktivFül("Fighters");
-
               }}
             />
-
           </Box>
 
           <AuthHero
@@ -269,19 +219,13 @@ export default function App() {
               "/hero/hero3.jpg",
             ]}
           />
-
         </Box>
-
       )}
 
       {isAuthenticated && aktivFül === "Fighters" && (
-
         <Box sx={{ position: "relative" }}>
-
           {!filterOpen && (
-
             <Tooltip title="Filters">
-
               <IconButton
                 onClick={() => setFilterOpen(true)}
                 sx={{
@@ -300,9 +244,7 @@ export default function App() {
               >
                 <FilterListIcon />
               </IconButton>
-
             </Tooltip>
-
           )}
 
           <FilterSidebar
@@ -315,31 +257,25 @@ export default function App() {
             setSearch={setSearch}
             title="Division filter"
             navHeight={NAV_H}
-            variant={isDesktop ? "persistent" : "temporary"}
           />
 
           <Box
             sx={{
-              pl: `${pageLeftPadding}px`,
-              transition: "padding-left 200ms ease",
               display: "grid",
               gap: 3,
               gridTemplateColumns: {
                 xs: "1fr",
-                lg: "2fr 1fr",
+                lg: "minmax(0, 2fr) minmax(320px, 1fr)",
               },
               alignItems: "start",
             }}
           >
-
             <Box sx={{ minWidth: 0 }}>
-
               <FighterGrid
                 fighters={filteredFighters}
                 selectedId={kivalasztott?.id ?? null}
                 onSelect={(f) => setKivalasztott(f)}
               />
-
             </Box>
 
             <Box
@@ -355,33 +291,25 @@ export default function App() {
                 pr: { lg: 1 },
               }}
             >
-
               <FighterDetails
                 fighter={kivalasztott}
                 mode="preview"
                 isAdmin={isAdmin}
               />
-
             </Box>
-
           </Box>
-
         </Box>
-
       )}
 
       {isAuthenticated && aktivFül === "Details" && (
-
         <FighterDetails
           fighter={kivalasztott}
           mode="full"
           isAdmin={isAdmin}
         />
-
       )}
 
       {isAuthenticated && aktivFül === "Compare" && (
-
         <ComparePanel
           fighters={fighters}
           left={left}
@@ -389,25 +317,18 @@ export default function App() {
           setLeft={setLeft}
           setRight={setRight}
         />
-
       )}
 
       {isAuthenticated && aktivFül === "Forum" && (
         <CategoriesPage />
       )}
-
     </>
-
   );
 
   return (
-
     <UnitProvider>
-
       <Box sx={{ minHeight: "100vh", bgcolor: "#0b0b0b" }}>
-
         {aktivFül !== "Auth" && (
-
           <Navbar
             height={NAV_H}
             aktivFül={aktivFül}
@@ -415,7 +336,6 @@ export default function App() {
             user={user}
             onLogout={handleLogout}
           />
-
         )}
 
         {aktivFül !== "Auth" && (
@@ -429,31 +349,19 @@ export default function App() {
             bgcolor: "#0b0b0b",
           }}
         >
-
           {aktivFül === "Compare" && isAuthenticated ? (
-
             <Box sx={{ py: 3, px: { xs: 2, sm: 3, md: 4 } }}>
-
               <Box sx={{ maxWidth: 1100, mx: "auto" }}>
                 {tartalom}
               </Box>
-
             </Box>
-
           ) : (
-
             <Container maxWidth="xl" sx={{ py: 3 }}>
               {tartalom}
             </Container>
-
           )}
-
         </Box>
-
       </Box>
-
     </UnitProvider>
-
   );
-
 }
