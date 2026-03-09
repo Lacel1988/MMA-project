@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Category, Topic, Post, Reply, PostLike
 
 
+<<<<<<< HEAD
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -34,21 +35,15 @@ class TopicSerializer(serializers.ModelSerializer):
         read_only_fields = ["created_by", "created_at"]
 
 
+=======
+>>>>>>> origin/forum-alpha
 class ReplySerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(read_only=True)
     author_username = serializers.CharField(source="author.username", read_only=True)
 
     class Meta:
         model = Reply
-        fields = [
-            "id",
-            "post",
-            "author",
-            "author_username",
-            "content",
-            "replied_at",
-        ]
-        read_only_fields = ["author", "replied_at"]
+        fields = ["id", "author", "author_username", "content", "replied_at"]
 
 
 class PostLikeSerializer(serializers.ModelSerializer):
@@ -57,14 +52,7 @@ class PostLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostLike
-        fields = [
-            "id",
-            "post",
-            "user",
-            "user_username",
-            "liked_at",
-        ]
-        read_only_fields = ["user", "liked_at"]
+        fields = ["id", "user", "user_username", "liked_at"]
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -72,18 +60,36 @@ class PostSerializer(serializers.ModelSerializer):
     author_username = serializers.CharField(source="author.username", read_only=True)
 
     replies = ReplySerializer(many=True, read_only=True)
-    likes_count = serializers.IntegerField(source="likes.count", read_only=True)
+    likes = PostLikeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
         fields = [
             "id",
-            "topic",
             "author",
             "author_username",
             "content",
             "posted_at",
             "replies",
-            "likes_count",
+            "likes",
         ]
+<<<<<<< HEAD
         read_only_fields = ["author", "posted_at"]
+=======
+
+
+class TopicSerializer(serializers.ModelSerializer):
+    posts = PostSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Topic
+        fields = ["id", "title", "description", "created_by", "created_at", "posts"]
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    topics = TopicSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ["id", "name", "description", "topics"]
+>>>>>>> origin/forum-alpha

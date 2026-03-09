@@ -12,6 +12,7 @@ import AuthPanel from "./components/auth/AuthPanel";
 import AuthHero from "./components/auth/AuthHero";
 
 import type { Fighter } from "./types";
+<<<<<<< HEAD
 
 import {
   fetchMe,
@@ -26,6 +27,11 @@ import { UnitProvider } from "./context/UnitContext";
 
 import FilterSidebar from "./components/FilterSidebar";
 import FilterListIcon from "@mui/icons-material/FilterList";
+=======
+import { fetchMe, logout, type MeResponse } from "./api/authApi";
+import CategoriesTreePage from "./components/MmaForum";
+import NestedForumPage from "./components/MmaForum";
+>>>>>>> origin/forum-alpha
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
@@ -319,8 +325,16 @@ export default function App() {
         />
       )}
 
+<<<<<<< HEAD
       {isAuthenticated && aktivFül === "Forum" && (
         <CategoriesPage />
+=======
+      {/* FORUM */}
+      {aktivFül === "Forum" && (
+        <NestedForumPage />
+
+
+>>>>>>> origin/forum-alpha
       )}
     </>
   );

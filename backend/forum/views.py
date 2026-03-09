@@ -27,6 +27,7 @@ class TopicViewSet(viewsets.ModelViewSet):
         serializer.save(created_by=self.request.user)
 
     def perform_update(self, serializer):
+<<<<<<< HEAD
         if serializer.instance.created_by != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Csak a saját témádat módosíthatod (vagy moderátor).")
         serializer.save()
@@ -34,6 +35,17 @@ class TopicViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         if instance.created_by != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Csak a saját témádat törölheted (vagy moderátor).")
+=======
+        user = self.request.user
+        if serializer.instance.created_by != user and not user.is_staff:
+            raise PermissionDenied("Csak a saját témádat módosíthatod.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        if instance.created_by != user and not user.is_staff:
+            raise PermissionDenied("Csak a saját témádat törölheted.")
+>>>>>>> origin/forum-alpha
         instance.delete()
 
 
@@ -46,6 +58,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
+<<<<<<< HEAD
         if serializer.instance.author != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Csak a saját hozzászólásodat módosíthatod (vagy moderátor).")
         serializer.save()
@@ -53,6 +66,17 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         if instance.author != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Csak a saját hozzászólásodat törölheted (vagy moderátor).")
+=======
+        user = self.request.user
+        if serializer.instance.author != user and not user.is_staff:
+            raise PermissionDenied("Csak a saját hozzászólásodat módosíthatod.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        if instance.author != user and not user.is_staff:
+            raise PermissionDenied("Csak a saját hozzászólásodat törölheted.")
+>>>>>>> origin/forum-alpha
         instance.delete()
 
 
@@ -65,6 +89,7 @@ class ReplyViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
+<<<<<<< HEAD
         if serializer.instance.author != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Csak a saját válaszodat módosíthatod (vagy moderátor).")
         serializer.save()
@@ -82,6 +107,23 @@ class PostLikeViewSet(
     viewsets.GenericViewSet
 ):
     queryset = PostLike.objects.all().select_related("post", "user").order_by("-liked_at")
+=======
+        user = self.request.user
+        if serializer.instance.author != user and not user.is_staff:
+            raise PermissionDenied("Csak a saját válaszodat módosíthatod.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        if instance.author != user and not user.is_staff:
+            raise PermissionDenied("Csak a saját válaszodat törölheted.")
+        instance.delete()
+
+
+# LIKE
+class PostLikeViewSet(viewsets.ModelViewSet):
+    queryset = PostLike.objects.all().select_related("post", "user")
+>>>>>>> origin/forum-alpha
     serializer_class = PostLikeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -90,5 +132,9 @@ class PostLikeViewSet(
 
     def perform_destroy(self, instance):
         if instance.user != self.request.user and not self.request.user.is_staff:
+<<<<<<< HEAD
             raise PermissionDenied("Csak a saját lájkodat törölheted (vagy moderátor).")
+=======
+            raise PermissionDenied("Csak a saját lájkodat törölheted.")
+>>>>>>> origin/forum-alpha
         instance.delete()

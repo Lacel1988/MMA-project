@@ -21,8 +21,15 @@ import {
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 
+<<<<<<< HEAD
 import type { Category } from "../api/forumApi";
 import { listCategories, createCategory, updateCategory, deleteCategory } from "../api/forumApi";
+=======
+//import type { Category } from "../api/forumApi";
+import type { Category, Topic, Reply, Post, Like } from "../api/forumApi";
+import { listCategories, createCategory, updateCategory, deleteCategory, listTopics, getTopic, createTopic, updateTopic, deleteTopic, listPosts, getPost, createPost, updatePost, deletePost, listReplies, createReply, updateReply, deleteReply, likePost, unlikePost, listPostLikes } from "../api/forumApi";
+//import { listCategories, createCategory, updateCategory, deleteCategory } from "../api/forumApi";
+>>>>>>> origin/forum-alpha
 
 type CategoryFormState = {
   id?: number;
@@ -174,7 +181,11 @@ const CategoriesPage: React.FC = () => {
       )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+<<<<<<< HEAD
         <DialogTitle>{form.id ? "Edit category" : "Create new category"}</DialogTitle>
+=======
+        <DialogTitle>{form.id ? "Edit category" : "Create category"}</DialogTitle>
+>>>>>>> origin/forum-alpha
         <DialogContent>
           <Box mt={1} display="flex" flexDirection="column" gap={2}>
             <TextField
