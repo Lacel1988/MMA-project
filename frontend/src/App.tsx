@@ -1,37 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { Container, Box, Typography, IconButton, Tooltip } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 import Navbar from "./components/Navbar";
 import FighterGrid from "./components/FighterGrid";
 import FighterDetails from "./components/FighterDetails";
 import ComparePanel from "./components/compare/ComparePanel";
-import CategoriesPage from "./components/MmaForum";
+import NestedForumPage from "./components/MmaForum";
 
 import AuthPanel from "./components/auth/AuthPanel";
 import AuthHero from "./components/auth/AuthHero";
 
 import type { Fighter } from "./types";
-<<<<<<< HEAD
-
 import {
   fetchMe,
   logout,
   getRefreshToken,
   type MeResponse,
 } from "./api/authApi";
-
 import { tryRefreshAccessToken } from "./api/client";
-
 import { UnitProvider } from "./context/UnitContext";
-
 import FilterSidebar from "./components/FilterSidebar";
-import FilterListIcon from "@mui/icons-material/FilterList";
-=======
-import { fetchMe, logout, type MeResponse } from "./api/authApi";
-import CategoriesTreePage from "./components/MmaForum";
-import NestedForumPage from "./components/MmaForum";
->>>>>>> origin/forum-alpha
 
 type Ful = "Fighters" | "Details" | "Compare" | "Auth" | "Forum";
 
@@ -79,7 +69,6 @@ export default function App() {
         }
 
         const me = await fetchMe();
-
         setUser(me);
         setAktivFül("Fighters");
       } catch {
@@ -100,10 +89,7 @@ export default function App() {
       })
       .then((data: Fighter[]) => {
         setFighters(data);
-
-        setKivalasztott(
-          (prev) => prev ?? (data.length > 0 ? data[0] : null)
-        );
+        setKivalasztott((prev) => prev ?? (data.length > 0 ? data[0] : null));
       })
       .catch((err) => setHiba(err.message));
   }, []);
@@ -119,10 +105,8 @@ export default function App() {
 
     setUser(null);
     setAktivFül("Auth");
-
     setLeft(null);
     setRight(null);
-
     setFilterOpen(false);
   }
 
@@ -146,9 +130,7 @@ export default function App() {
       }
     }
 
-    return Array.from(map.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [fighters]);
 
   const filteredFighters = useMemo(() => {
@@ -156,12 +138,9 @@ export default function App() {
 
     return fighters.filter((f) => {
       const okDiv =
-        aktivDivisionId === null
-          ? true
-          : f.division?.id === aktivDivisionId;
+        aktivDivisionId === null ? true : f.division?.id === aktivDivisionId;
 
       if (!okDiv) return false;
-
       if (!q) return true;
 
       const name = (f.name ?? "").toLowerCase();
@@ -179,9 +158,7 @@ export default function App() {
       return;
     }
 
-    const exists = filteredFighters.some(
-      (x) => x.id === kivalasztott.id
-    );
+    const exists = filteredFighters.some((x) => x.id === kivalasztott.id);
 
     if (!exists) setKivalasztott(filteredFighters[0] ?? null);
   }, [filteredFighters, aktivFül, kivalasztott]);
@@ -203,10 +180,7 @@ export default function App() {
           }}
         >
           <Box>
-            <Typography
-              variant="h4"
-              sx={{ mb: 2, color: "white" }}
-            >
+            <Typography variant="h4" sx={{ mb: 2, color: "white" }}>
               Auth
             </Typography>
 
@@ -325,16 +299,8 @@ export default function App() {
         />
       )}
 
-<<<<<<< HEAD
       {isAuthenticated && aktivFül === "Forum" && (
-        <CategoriesPage />
-=======
-      {/* FORUM */}
-      {aktivFül === "Forum" && (
         <NestedForumPage />
-
-
->>>>>>> origin/forum-alpha
       )}
     </>
   );
@@ -352,9 +318,7 @@ export default function App() {
           />
         )}
 
-        {aktivFül !== "Auth" && (
-          <Box sx={{ height: NAV_H }} />
-        )}
+        {aktivFül !== "Auth" && <Box sx={{ height: NAV_H }} />}
 
         <Box
           component="main"
