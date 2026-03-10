@@ -19,12 +19,8 @@ const bodyFont = "var(--mma-body-font)";
  */
 const LINE_MS = 15000;
 
-// CSAK EZEK a háttérképek játszanak a Details fülön
-const UFC_DETAILS_BG = [
-  "http://localhost:8000/media/fighters/UFC_details_1.png",
-  "http://localhost:8000/media/fighters/UFC_details_2.png",
-  "http://localhost:8000/media/fighters/UFC_details_3.png",
-];
+// CSAK EZ az egy háttérkép játszik a Details fülön
+const UFC_DETAILS_BG = "http://localhost:8000/media/fighters/UFC_details_1.png";
 
 export default function FighterDetails({
   fighter,
@@ -39,7 +35,7 @@ export default function FighterDetails({
           bgcolor: "rgba(255,255,255,0.04)",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 3,
-          p: 2,
+          p: { xs: 2, sm: 2.5 },
           color: "white",
           height: mode === "preview" ? { lg: "100%" } : "auto",
           display: "flex",
@@ -95,12 +91,13 @@ function PreviewDetails({
     >
       <Box
         sx={{
-          height: 320,
+          height: { xs: 220, sm: 280, md: 320 },
           flexShrink: 0,
           bgcolor: "#0c0c0c",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          p: { xs: 1, sm: 2 },
         }}
       >
         {kep ? (
@@ -108,7 +105,11 @@ function PreviewDetails({
             component="img"
             src={kep}
             alt={fighter.name}
-            sx={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }}
+            sx={{
+              maxHeight: "100%",
+              maxWidth: "100%",
+              objectFit: "contain",
+            }}
           />
         ) : (
           <Typography sx={{ opacity: 0.7, fontFamily: bodyFont }}>No image</Typography>
@@ -117,40 +118,92 @@ function PreviewDetails({
 
       <Box
         sx={{
-          p: 2,
+          p: { xs: 1.5, sm: 2, md: 2.5 },
           display: "flex",
           flexDirection: "column",
           flexGrow: 1,
           minHeight: 0,
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 900, fontFamily: titleFont, letterSpacing: 0.6 }}>
+        <Typography
+          sx={{
+            fontWeight: 900,
+            fontFamily: titleFont,
+            letterSpacing: 0.6,
+            fontSize: { xs: "1.35rem", sm: "1.6rem" },
+            lineHeight: 1.15,
+            wordBreak: "break-word",
+          }}
+        >
           {fighter.name}
         </Typography>
 
         {isAdmin ? <FighterAdminEditor fighter={fighter} onUpdated={onUpdated} /> : null}
 
         {fighter.nickname ? (
-          <Typography sx={{ opacity: 0.85, fontStyle: "italic", fontFamily: bodyFont }}>
+          <Typography
+            sx={{
+              mt: 0.5,
+              opacity: 0.85,
+              fontStyle: "italic",
+              fontFamily: bodyFont,
+              fontSize: { xs: 14, sm: 16 },
+            }}
+          >
             "{fighter.nickname}"
           </Typography>
         ) : null}
 
-        <Box sx={{ mt: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            mt: 1.2,
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
           <Chip
             label={fighter.division.name}
-            sx={{ bgcolor: "#b71c1c", color: "#fff", fontWeight: 800, fontFamily: titleFont }}
+            sx={{
+              bgcolor: "#b71c1c",
+              color: "#fff",
+              fontWeight: 800,
+              fontFamily: titleFont,
+              maxWidth: "100%",
+              "& .MuiChip-label": {
+                display: "block",
+                whiteSpace: "normal",
+              },
+            }}
           />
           <Chip
             label={`Record: ${fighter.wins}-${fighter.losses}-${fighter.draw}`}
-            sx={{ bgcolor: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: bodyFont }}
+            sx={{
+              bgcolor: "rgba(255,255,255,0.08)",
+              color: "#fff",
+              fontFamily: bodyFont,
+              maxWidth: "100%",
+              "& .MuiChip-label": {
+                display: "block",
+                whiteSpace: "normal",
+              },
+            }}
           />
         </Box>
 
-        <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.10)" }} />
+        <Divider sx={{ my: { xs: 1.5, sm: 2 }, borderColor: "rgba(255,255,255,0.10)" }} />
 
-        <Box sx={{ flexGrow: 1, minHeight: 0, overflowY: "auto", pr: 1 }}>
-          <Typography sx={{ opacity: 0.9, whiteSpace: "pre-wrap", lineHeight: 1.6, fontFamily: bodyFont }}>
+        <Box sx={{ flexGrow: 1, minHeight: 0, overflowY: "auto", pr: { xs: 0.5, sm: 1 } }}>
+          <Typography
+            sx={{
+              opacity: 0.9,
+              whiteSpace: "pre-wrap",
+              lineHeight: 1.6,
+              fontFamily: bodyFont,
+              fontSize: { xs: 14, sm: 15.5 },
+              wordBreak: "break-word",
+            }}
+          >
             {szoveg || "No description."}
           </Typography>
         </Box>
@@ -216,20 +269,37 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
         }}
       />
 
-      <Box sx={{ position: "relative", p: 2 }}>
-        <Typography variant="h4" sx={{ fontFamily: titleFont, fontWeight: 900, letterSpacing: 0.8 }}>
+      <Box sx={{ position: "relative", p: { xs: 1.5, sm: 2, md: 2.5 } }}>
+        <Typography
+          sx={{
+            fontFamily: titleFont,
+            fontWeight: 900,
+            letterSpacing: 0.8,
+            fontSize: { xs: "1.6rem", sm: "2rem", md: "2.25rem" },
+            lineHeight: 1.1,
+            wordBreak: "break-word",
+          }}
+        >
           {fighter.name}
         </Typography>
 
         {fighter.nickname ? (
-          <Typography sx={{ opacity: 0.85, fontStyle: "italic", mt: 0.5, fontFamily: bodyFont }}>
+          <Typography
+            sx={{
+              opacity: 0.85,
+              fontStyle: "italic",
+              mt: 0.5,
+              fontFamily: bodyFont,
+              fontSize: { xs: 14, sm: 16 },
+            }}
+          >
             "{fighter.nickname}"
           </Typography>
         ) : null}
 
         <Box
           sx={{
-            mt: 2,
+            mt: { xs: 1.5, sm: 2 },
             opacity: stage === "timeline" ? 1 : 0,
             transform: stage === "timeline" ? "translateY(0)" : "translateY(14px)",
             transition: "opacity 650ms ease 220ms, transform 650ms ease 220ms",
@@ -238,18 +308,34 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
           {!hasEvents ? (
             <Box
               sx={{
-                mt: 3,
+                mt: 2,
                 bgcolor: "rgba(255,255,255,0.04)",
                 border: "1px solid rgba(255,255,255,0.10)",
                 borderRadius: 3,
-                p: 2,
+                p: { xs: 1.5, sm: 2 },
               }}
             >
-              <Typography sx={{ opacity: 0.9, fontWeight: 900, fontFamily: titleFont, letterSpacing: 0.4 }}>
+              <Typography
+                sx={{
+                  opacity: 0.9,
+                  fontWeight: 900,
+                  fontFamily: titleFont,
+                  letterSpacing: 0.4,
+                  fontSize: { xs: 18, sm: 20 },
+                }}
+              >
                 No career highlights yet.
               </Typography>
-              <Typography sx={{ opacity: 0.75, mt: 1, fontFamily: bodyFont }}>
-                Add at least 3 blocks into bio_long with this format: [YYYY-MM-DD] Title then description lines, then an empty line.
+              <Typography
+                sx={{
+                  opacity: 0.75,
+                  mt: 1,
+                  fontFamily: bodyFont,
+                  fontSize: { xs: 14, sm: 15 },
+                }}
+              >
+                Add at least 3 blocks into bio_long with this format: [YYYY-MM-DD] Title then
+                description lines, then an empty line.
               </Typography>
             </Box>
           ) : (
@@ -315,40 +401,35 @@ function TimelineCore({
         overflow: "hidden",
       }}
     >
-      {/* HATTER: KEPEK EGYMAS ALATT (NEM EGymasra), A TIMELINE MAGASSAGAHOZ KOTVE */}
       <Box
         sx={{
           position: "absolute",
           inset: 0,
-          display: "flex",
-          flexDirection: "column",
           opacity: 0.28,
           pointerEvents: "none",
+          backgroundImage: `url(${UFC_DETAILS_BG})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+
+      <Box
+        sx={{
+          position: "relative",
+          px: { xs: 1, sm: 2, md: 3 },
+          py: { xs: 4, sm: 6, md: 10 },
         }}
       >
-        {UFC_DETAILS_BG.map((src, i) => (
-          <Box
-            key={`${src}-${i}`}
-            sx={{
-              flex: 1,
-              backgroundImage: `url(${src})`,
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-        ))}
-      </Box>
-
-      <Box sx={{ position: "relative", px: { xs: 1, sm: 2 }, py: 10 }}>
         <Box
           className="mma-timeline-line"
           sx={{
             position: "absolute",
-            left: "50%",
             top: 0,
-            height: "100%",
-            width: 32,
+            bottom: 0,
+            left: { xs: 24, sm: 30, md: "50%" },
+            transform: "translateX(-50%)",
+            width: { xs: 8, sm: 10, md: 18 },
             borderRadius: 999,
             bgcolor: "rgba(183,28,28,0.95)",
             boxShadow: "0 0 14px rgba(183,28,28,0.14)",
@@ -374,21 +455,31 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
     letterSpacing: 0.7,
     opacity: 0.97,
     textShadow: "0 10px 20px rgba(0,0,0,0.45)",
+    fontSize: "clamp(1rem, 1.6vw, 1.35rem)",
+    lineHeight: 1.2,
+    wordBreak: "break-word",
   } as const;
 
   const dateSx = {
     ...titleSx,
-    fontSize: 15,
+    fontSize: "clamp(0.82rem, 1.2vw, 0.95rem)",
     opacity: 0.92,
   } as const;
 
   return (
     <Box
       sx={{
+        position: "relative",
         display: "grid",
-        gridTemplateColumns: { xs: "1fr 140px", md: "1fr 140px 1fr" },
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "1fr",
+          md: "1fr 140px 1fr",
+        },
         alignItems: "center",
-        py: { xs: 16, md: 28 },
+        gap: { xs: 1, sm: 1.5, md: 0 },
+        py: { xs: 3, sm: 4, md: 3.5 },
+        minHeight: { xs: 74, sm: 84, md: 96 },
       }}
     >
       <Box sx={{ display: { xs: "none", md: "block" }, pr: 4, textAlign: "right" }}>
@@ -399,7 +490,13 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         )}
       </Box>
 
-      <Box sx={{ position: "relative", height: 40 }}>
+      <Box
+        sx={{
+          display: { xs: "none", md: "block" },
+          position: "relative",
+          height: 40,
+        }}
+      >
         <Tooltip
           arrow
           placement={titleOnLeft ? "left" : "right"}
@@ -412,7 +509,7 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
                 fontFamily: bodyFont,
                 fontSize: 14,
                 lineHeight: 1.7,
-                maxWidth: 520,
+                maxWidth: { xs: 280, sm: 380, md: 520 },
                 p: 1.5,
               },
             },
@@ -439,12 +536,12 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
               position: "absolute",
               left: "50%",
               top: "50%",
-              width: 35,
-              height: 35,
+              width: { md: 22 },
+              height: { md: 22 },
               borderRadius: 999,
               bgcolor: "rgba(255,255,255,0.92)",
               transform: "translate(-50%, -50%)",
-              boxShadow: "0 0 0 8px rgba(183,28,28,0.16), 0 0 14px rgba(183,28,28,0.10)",
+              boxShadow: "0 0 0 5px rgba(183,28,28,0.16), 0 0 10px rgba(183,28,28,0.10)",
               transition: "transform 140ms ease",
               "&:hover": { transform: "translate(-50%, -50%) scale(1.06)" },
             }}
@@ -463,10 +560,79 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         )}
       </Box>
 
-      <Box sx={{ display: { xs: "block", md: "none" } }}>
+      <Box
+        sx={{
+          display: { xs: "block", md: "none" },
+          position: "relative",
+          pl: { xs: 5.5, sm: 6.5 },
+          minWidth: 0,
+        }}
+      >
+        <Tooltip
+          arrow
+          placement="right"
+          slotProps={{
+            tooltip: {
+              sx: {
+                bgcolor: "rgba(10,10,10,0.92)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                backdropFilter: "blur(8px)",
+                fontFamily: bodyFont,
+                fontSize: 14,
+                lineHeight: 1.7,
+                maxWidth: { xs: 280, sm: 380 },
+                p: 1.5,
+              },
+            },
+            arrow: { sx: { color: "rgba(10,10,10,0.92)" } },
+          }}
+          title={
+            <Box>
+              <Typography sx={{ fontFamily: titleFont, fontWeight: 900, letterSpacing: 0.5 }}>
+                {ev.title}
+              </Typography>
+              <Typography sx={{ opacity: 0.8, mt: 0.3, fontFamily: bodyFont, fontSize: 12 }}>
+                {ev.date}
+              </Typography>
+              <Typography sx={{ mt: 1, whiteSpace: "pre-wrap", fontFamily: bodyFont }}>
+                {ev.text || "No description."}
+              </Typography>
+            </Box>
+          }
+        >
+          <Box
+            className="mma-timeline-dot"
+            sx={{
+              cursor: "pointer",
+              position: "absolute",
+              left: { xs: 24, sm: 30 },
+              top: "50%",
+              width: { xs: 16, sm: 18 },
+              height: { xs: 16, sm: 18 },
+              borderRadius: 999,
+              bgcolor: "rgba(255,255,255,0.92)",
+              transform: "translate(-50%, -50%)",
+              boxShadow: "0 0 0 5px rgba(183,28,28,0.16), 0 0 10px rgba(183,28,28,0.10)",
+              transition: "transform 140ms ease",
+              "&:hover": { transform: "translate(-50%, -50%) scale(1.06)" },
+            }}
+            style={{
+              ["--dot-delay" as any]: `${3800 + idx * 380}ms`,
+            }}
+          />
+        </Tooltip>
+
         <Typography sx={titleSx}>{ev.title}</Typography>
-        <Typography sx={{ ...dateSx, mt: 0.7 }}>{ev.date}</Typography>
-        <Typography sx={{ mt: 0.9, opacity: 0.7, fontFamily: bodyFont, fontSize: 13 }}>
+        <Typography sx={{ ...dateSx, mt: 0.5 }}>{ev.date}</Typography>
+        <Typography
+          sx={{
+            mt: 0.8,
+            opacity: 0.72,
+            fontFamily: bodyFont,
+            fontSize: 13,
+            lineHeight: 1.5,
+          }}
+        >
           Tap the dot for details.
         </Typography>
       </Box>

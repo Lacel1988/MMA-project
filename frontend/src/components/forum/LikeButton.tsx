@@ -1,18 +1,30 @@
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import { IconButton } from "@mui/material";
+import React from "react";
+import { Button } from "@mui/material";
+import { ThumbUpAlt } from "@mui/icons-material";
 
 type Props = {
-  count: number;
-  onLike?: () => void;
+  postId: number;
+  loading?: boolean;
+  onLike: (postId: number) => void;
 };
 
-export default function LikeButton({ count, onLike }: Props) {
+const LikeButton: React.FC<Props> = ({ postId, loading, onLike }) => {
   return (
-    <div className="like-button">
-      <IconButton size="small" onClick={onLike}>
-        <ThumbUpIcon sx={{ color: "#d20a0a" }} />
-      </IconButton>
-      <span>{count}</span>
-    </div>
+    <Button
+      size="small"
+      startIcon={<ThumbUpAlt sx={{ color: "#c40000" }} />}
+      onClick={() => onLike(postId)}
+      disabled={loading}
+      sx={{
+        color: "#fff",
+        borderColor: "rgba(255,255,255,0.14)",
+        minWidth: "auto",
+      }}
+      variant="outlined"
+    >
+      {loading ? "..." : "Like"}
+    </Button>
   );
-}
+};
+
+export default LikeButton;

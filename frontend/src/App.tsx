@@ -300,7 +300,7 @@ export default function App() {
       )}
 
       {isAuthenticated && aktivFül === "Forum" && (
-        <NestedForumPage />
+        <NestedForumPage user={user} />
       )}
     </>
   );
