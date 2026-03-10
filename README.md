@@ -1,43 +1,177 @@
-## Environment configuration
+README.txt
 
-This project uses a local `secret.py` file to store sensitive configuration values.
-Sensitive files are intentionally excluded from version control.
+# MMA Project
 
-### SECRET_KEY
+## HU – Projekt leírás
 
-To run the project, you must create a file named `secret.py` in the following directory:
+Az MMA Project egy teljes stack webalkalmazás, amely MMA harcosok adatainak kezelésére és megjelenítésére készült.
 
-`backend/config/secret.py`
+A projekt célja egy modern webes felület létrehozása, ahol a felhasználók böngészhetik a harcosok adatait, összehasonlíthatják őket, valamint megtekinthetik a részletes statisztikákat.
 
-The file must contain the following variable:
+A rendszer két fő részből áll:
 
-```python
+- Backend: Django + Django REST Framework
+- Frontend: React + TypeScript + MUI
+
+
+## Projekt struktúra
+
+MMA-project
+├ backend
+│  ├ manage.py
+│  ├ requirements.txt
+│  ├ config
+│  │  └ secret.py (local file, not in repository)
+│  └ ...
+├ frontend
+│  ├ package.json
+│  ├ src
+│  └ ...
+
+
+## Backend telepítés
+
+Lépj be a backend könyvtárba:
+
+cd backend
+
+Telepítsd a szükséges Python csomagokat:
+
+pip install -r requirements.txt
+
+
+### SECRET_KEY konfiguráció
+
+A projekt egy lokális secret.py fájlt használ az érzékeny adatok tárolására.
+
+Hozd létre a következő fájlt:
+
+backend/config/secret.py
+
+A fájl tartalma:
+
 SECRET_KEY = "your-django-secret-key"
-```
 
-The `secret.py` file is intentionally excluded from version control and must be created locally by each developer.
+Biztonságos Django SECRET_KEY generálható itt:
+https://djecrety.ir/
+
+Ez a fájl nem része a repository-nak és minden fejlesztőnek lokálisan kell létrehoznia.
+
+
+### Adatbázis inicializálása
+
+A projekt fejlesztés során SQLite adatbázist használ.
+
+Az adatbázis lokálisan jön létre, ezért klónozás után futtasd:
+
+python manage.py migrate
+
+Admin felhasználó létrehozása:
+
+python manage.py createsuperuser
+
+Backend indítása:
+
+python manage.py runserver
+
+
+## Frontend telepítés
+
+Lépj be a frontend könyvtárba:
+
+cd frontend
+
+Telepítsd a dependency-ket:
+
+npm install
+
+Frontend indítása:
+
+npm run dev
+
+
+## Tesztelés
+
+A tesztelési útmutató a következő fájlban található:
+
+TESTING.md
+
+
+# EN – Project description
+
+The MMA Project is a full-stack web application designed to manage and display MMA fighter data.
+
+The goal of the project is to provide a modern interface where users can browse fighters, compare statistics and view detailed fighter information.
+
+The system consists of two main components:
+
+- Backend: Django + Django REST Framework
+- Frontend: React + TypeScript + MUI
+
+
+## Backend setup
+
+Navigate to the backend directory:
+
+cd backend
+
+Install Python dependencies:
+
+pip install -r requirements.txt
+
+
+### SECRET_KEY configuration
+
+The project uses a local secret.py file to store sensitive configuration values.
+
+Create the following file:
+
+backend/config/secret.py
+
+Content:
+
+SECRET_KEY = "your-django-secret-key"
 
 You can generate a secure Django secret key here:
 https://djecrety.ir/
 
----
+This file is intentionally excluded from version control.
 
-### Database
 
-The project uses a local SQLite database (`db.sqlite3`) for development purposes.
+### Database initialization
 
-The database file is created locally on each developer’s machine and is not included in version control,
-as it may contain local data such as users, permissions and test records.
+The project uses a local SQLite database for development.
 
-After cloning the repository, initialize the database by running the following commands:
+After cloning the repository run:
 
-```cmd
 python manage.py migrate
+
+Create an admin user:
+
 python manage.py createsuperuser
-```
 
-These commands will create the database structure and allow you to create an admin user.
+Start the backend server:
 
-### TESTING
-Testing instructions can be found in TESTING.md.
+python manage.py runserver
 
+
+## Frontend setup
+
+Navigate to the frontend directory:
+
+cd frontend
+
+Install dependencies:
+
+npm install
+
+Start the development server:
+
+npm run dev
+
+
+## Testing
+
+Testing instructions can be found in:
+
+TESTING.md
