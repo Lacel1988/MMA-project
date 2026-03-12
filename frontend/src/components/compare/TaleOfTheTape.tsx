@@ -14,24 +14,50 @@ function StatRow({
   return (
     <Box
       sx={{
-        display: "grid",
-        gridTemplateColumns: "1fr auto 1fr",
-        gap: 2,
-        alignItems: "center",
         py: 1.1,
       }}
     >
-      <Typography sx={{ textAlign: "right", fontWeight: 800 }}>
-        {left ?? "-"}
-      </Typography>
+      <Box
+        sx={{
+          display: { xs: "grid", sm: "grid" },
+          gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+          gap: { xs: 0.5, sm: 2 },
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          sx={{
+            textAlign: { xs: "center", sm: "right" },
+            fontWeight: 800,
+            wordBreak: "break-word",
+          }}
+        >
+          {left ?? "-"}
+        </Typography>
 
-      <Typography sx={{ opacity: 0.75, fontWeight: 800, fontStyle: "italic" }}>
-        {label}
-      </Typography>
+        <Typography
+          sx={{
+            opacity: 0.75,
+            fontWeight: 800,
+            fontStyle: "italic",
+            textAlign: "center",
+            fontSize: { xs: 13, sm: 15 },
+            py: { xs: 0.25, sm: 0 },
+          }}
+        >
+          {label}
+        </Typography>
 
-      <Typography sx={{ textAlign: "left", fontWeight: 800 }}>
-        {right ?? "-"}
-      </Typography>
+        <Typography
+          sx={{
+            textAlign: { xs: "center", sm: "left" },
+            fontWeight: 800,
+            wordBreak: "break-word",
+          }}
+        >
+          {right ?? "-"}
+        </Typography>
+      </Box>
     </Box>
   );
 }
@@ -97,14 +123,14 @@ export default function TaleOfTheTape({
         bgcolor: "rgba(255,255,255,0.04)",
         border: "1px solid rgba(255,255,255,0.08)",
         borderRadius: 3,
-        p: 2,
+        p: { xs: 1.5, sm: 2 },
         color: "white",
         width: "100%",
         maxWidth: 1100,
         mx: "auto",
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 900 }}>
+      <Typography variant="h6" sx={{ fontWeight: 900, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
         Tale of the Tape
       </Typography>
 
@@ -119,18 +145,22 @@ export default function TaleOfTheTape({
 
       <StatRow
         label="Height"
-        left={formatHeight((left as any)?.height_in, unit)}
-        right={formatHeight((right as any)?.height_in, unit)}
+        left={(left as any)?.height_in != null ? formatHeight((left as any).height_in, unit) : "-"}
+        right={(right as any)?.height_in != null ? formatHeight((right as any).height_in, unit) : "-"}
       />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+
       <StatRow
         label="Weight"
-        left={formatWeight((left as any)?.weight_lbs, unit)}
-        right={formatWeight((right as any)?.weight_lbs, unit)}
+        left={(left as any)?.weight_lbs != null ? formatWeight((left as any).weight_lbs, unit) : "-"}
+        right={(right as any)?.weight_lbs != null ? formatWeight((right as any).weight_lbs, unit) : "-"}
       />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
+
       <StatRow
         label="Reach"
-        left={formatReach((left as any)?.reach_in, unit)}
-        right={formatReach((right as any)?.reach_in, unit)}
+        left={(left as any)?.reach_in != null ? formatReach((left as any).reach_in, unit) : "-"}
+        right={(right as any)?.reach_in != null ? formatReach((right as any).reach_in, unit) : "-"}
       />
     </Paper>
   );

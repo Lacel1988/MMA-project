@@ -40,9 +40,16 @@ export default function FighterDetails({
           height: mode === "preview" ? { lg: "100%" } : "auto",
           display: "flex",
           alignItems: "center",
+          minWidth: 0,
         }}
       >
-        <Typography sx={{ opacity: 0.8, fontFamily: bodyFont }}>
+        <Typography
+          sx={{
+            opacity: 0.8,
+            fontFamily: bodyFont,
+            wordBreak: "break-word",
+          }}
+        >
           Select a fighter on the left to view details.
         </Typography>
       </Box>
@@ -87,6 +94,7 @@ function PreviewDetails({
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
+        minWidth: 0,
       }}
     >
       <Box
@@ -98,6 +106,7 @@ function PreviewDetails({
           alignItems: "center",
           justifyContent: "center",
           p: { xs: 1, sm: 2 },
+          minWidth: 0,
         }}
       >
         {kep ? (
@@ -112,7 +121,15 @@ function PreviewDetails({
             }}
           />
         ) : (
-          <Typography sx={{ opacity: 0.7, fontFamily: bodyFont }}>No image</Typography>
+          <Typography
+            sx={{
+              opacity: 0.7,
+              fontFamily: bodyFont,
+              fontSize: { xs: 14, sm: 16 },
+            }}
+          >
+            No image
+          </Typography>
         )}
       </Box>
 
@@ -123,6 +140,7 @@ function PreviewDetails({
           flexDirection: "column",
           flexGrow: 1,
           minHeight: 0,
+          minWidth: 0,
         }}
       >
         <Typography
@@ -130,7 +148,7 @@ function PreviewDetails({
             fontWeight: 900,
             fontFamily: titleFont,
             letterSpacing: 0.6,
-            fontSize: { xs: "1.35rem", sm: "1.6rem" },
+            fontSize: { xs: "1.2rem", sm: "1.45rem", md: "1.6rem" },
             lineHeight: 1.15,
             wordBreak: "break-word",
           }}
@@ -148,6 +166,7 @@ function PreviewDetails({
               fontStyle: "italic",
               fontFamily: bodyFont,
               fontSize: { xs: 14, sm: 16 },
+              wordBreak: "break-word",
             }}
           >
             "{fighter.nickname}"
@@ -160,6 +179,7 @@ function PreviewDetails({
             display: "flex",
             gap: 1,
             flexWrap: "wrap",
+            minWidth: 0,
           }}
         >
           <Chip
@@ -173,6 +193,7 @@ function PreviewDetails({
               "& .MuiChip-label": {
                 display: "block",
                 whiteSpace: "normal",
+                wordBreak: "break-word",
               },
             }}
           />
@@ -186,6 +207,7 @@ function PreviewDetails({
               "& .MuiChip-label": {
                 display: "block",
                 whiteSpace: "normal",
+                wordBreak: "break-word",
               },
             }}
           />
@@ -193,7 +215,15 @@ function PreviewDetails({
 
         <Divider sx={{ my: { xs: 1.5, sm: 2 }, borderColor: "rgba(255,255,255,0.10)" }} />
 
-        <Box sx={{ flexGrow: 1, minHeight: 0, overflowY: "auto", pr: { xs: 0.5, sm: 1 } }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            minHeight: 0,
+            overflowY: "auto",
+            pr: { xs: 0.25, sm: 0.75, md: 1 },
+            minWidth: 0,
+          }}
+        >
           <Typography
             sx={{
               opacity: 0.9,
@@ -243,6 +273,7 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
         color: "white",
         border: "1px solid rgba(255,255,255,0.08)",
         bgcolor: "#0b0b0b",
+        minWidth: 0,
       }}
     >
       <Box
@@ -269,13 +300,13 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
         }}
       />
 
-      <Box sx={{ position: "relative", p: { xs: 1.5, sm: 2, md: 2.5 } }}>
+      <Box sx={{ position: "relative", p: { xs: 1.5, sm: 2, md: 2.5 }, minWidth: 0 }}>
         <Typography
           sx={{
             fontFamily: titleFont,
             fontWeight: 900,
             letterSpacing: 0.8,
-            fontSize: { xs: "1.6rem", sm: "2rem", md: "2.25rem" },
+            fontSize: { xs: "1.35rem", sm: "1.8rem", md: "2.25rem" },
             lineHeight: 1.1,
             wordBreak: "break-word",
           }}
@@ -291,6 +322,7 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
               mt: 0.5,
               fontFamily: bodyFont,
               fontSize: { xs: 14, sm: 16 },
+              wordBreak: "break-word",
             }}
           >
             "{fighter.nickname}"
@@ -303,6 +335,7 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
             opacity: stage === "timeline" ? 1 : 0,
             transform: stage === "timeline" ? "translateY(0)" : "translateY(14px)",
             transition: "opacity 650ms ease 220ms, transform 650ms ease 220ms",
+            minWidth: 0,
           }}
         >
           {!hasEvents ? (
@@ -322,6 +355,7 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
                   fontFamily: titleFont,
                   letterSpacing: 0.4,
                   fontSize: { xs: 18, sm: 20 },
+                  wordBreak: "break-word",
                 }}
               >
                 No career highlights yet.
@@ -332,6 +366,7 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
                   mt: 1,
                   fontFamily: bodyFont,
                   fontSize: { xs: 14, sm: 15 },
+                  wordBreak: "break-word",
                 }}
               >
                 Add at least 3 blocks into bio_long with this format: [YYYY-MM-DD] Title then
@@ -399,6 +434,7 @@ function TimelineCore({
         bgcolor: "rgba(0,0,0,0.06)",
         border: "1px solid rgba(255,255,255,0.08)",
         overflow: "hidden",
+        minWidth: 0,
       }}
     >
       <Box
@@ -419,6 +455,7 @@ function TimelineCore({
           position: "relative",
           px: { xs: 1, sm: 2, md: 3 },
           py: { xs: 4, sm: 6, md: 10 },
+          minWidth: 0,
         }}
       >
         <Box
@@ -480,9 +517,10 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         gap: { xs: 1, sm: 1.5, md: 0 },
         py: { xs: 3, sm: 4, md: 3.5 },
         minHeight: { xs: 74, sm: 84, md: 96 },
+        minWidth: 0,
       }}
     >
-      <Box sx={{ display: { xs: "none", md: "block" }, pr: 4, textAlign: "right" }}>
+      <Box sx={{ display: { xs: "none", md: "block" }, pr: 4, textAlign: "right", minWidth: 0 }}>
         {titleOnLeft ? (
           <Typography sx={titleSx}>{ev.title}</Typography>
         ) : (
@@ -523,7 +561,14 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
               <Typography sx={{ opacity: 0.8, mt: 0.3, fontFamily: bodyFont, fontSize: 12 }}>
                 {ev.date}
               </Typography>
-              <Typography sx={{ mt: 1, whiteSpace: "pre-wrap", fontFamily: bodyFont }}>
+              <Typography
+                sx={{
+                  mt: 1,
+                  whiteSpace: "pre-wrap",
+                  fontFamily: bodyFont,
+                  wordBreak: "break-word",
+                }}
+              >
                 {ev.text || "No description."}
               </Typography>
             </Box>
@@ -552,7 +597,7 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
         </Tooltip>
       </Box>
 
-      <Box sx={{ display: { xs: "none", md: "block" }, pl: 4, textAlign: "left" }}>
+      <Box sx={{ display: { xs: "none", md: "block" }, pl: 4, textAlign: "left", minWidth: 0 }}>
         {!titleOnLeft ? (
           <Typography sx={titleSx}>{ev.title}</Typography>
         ) : (
@@ -594,7 +639,14 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
               <Typography sx={{ opacity: 0.8, mt: 0.3, fontFamily: bodyFont, fontSize: 12 }}>
                 {ev.date}
               </Typography>
-              <Typography sx={{ mt: 1, whiteSpace: "pre-wrap", fontFamily: bodyFont }}>
+              <Typography
+                sx={{
+                  mt: 1,
+                  whiteSpace: "pre-wrap",
+                  fontFamily: bodyFont,
+                  wordBreak: "break-word",
+                }}
+              >
                 {ev.text || "No description."}
               </Typography>
             </Box>
@@ -631,6 +683,7 @@ function TimelineRow({ ev, idx }: { ev: TimelineEvent; idx: number }) {
             fontFamily: bodyFont,
             fontSize: 13,
             lineHeight: 1.5,
+            wordBreak: "break-word",
           }}
         >
           Tap the dot for details.

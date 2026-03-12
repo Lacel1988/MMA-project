@@ -16,20 +16,38 @@ export default function FighterCompareCard({ fighter, title }: Props) {
         borderRadius: 3,
         overflow: "hidden",
         color: "white",
+        height: "100%",
       }}
     >
-      <Box sx={{ p: 2 }}>
-        <Typography sx={{ opacity: 0.75, fontWeight: 800, letterSpacing: 0.6 }}>
+      <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
+        <Typography
+          sx={{
+            opacity: 0.75,
+            fontWeight: 800,
+            letterSpacing: 0.6,
+            fontSize: { xs: 13, sm: 14 },
+          }}
+        >
           {title}
         </Typography>
 
         {!fighter ? (
           <Typography sx={{ mt: 2, opacity: 0.8 }}>Select a fighter.</Typography>
         ) : (
-          <Box sx={{ mt: 1, display: "flex", gap: 2, alignItems: "center" }}>
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              gap: { xs: 1.5, sm: 2 },
+              alignItems: { xs: "stretch", sm: "center" },
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Box
               sx={{
-                width : "200px",
+                width: { xs: "100%", sm: 200 },
+                maxWidth: { xs: 260, sm: 200 },
+                mx: { xs: "auto", sm: 0 },
                 aspectRatio: "1 / 1",
                 borderRadius: 2,
                 bgcolor: "#0c0c0c",
@@ -49,17 +67,33 @@ export default function FighterCompareCard({ fighter, title }: Props) {
                   sx={{ width: "100%", height: "100%", objectFit: "contain" }}
                 />
               ) : (
-                <Typography sx={{ opacity: 0.6, fontSize: 22 }}>No image</Typography>
+                <Typography sx={{ opacity: 0.6, fontSize: { xs: 18, sm: 22 } }}>
+                  No image
+                </Typography>
               )}
             </Box>
 
-            <Box sx={{ minWidth: 0 }}>
-              <Typography variant="h6" sx={{ fontWeight: 900, lineHeight: 1.15 }}>
+            <Box sx={{ minWidth: 0, width: "100%" }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 900,
+                  lineHeight: 1.15,
+                  fontSize: { xs: "1.05rem", sm: "1.25rem" },
+                  wordBreak: "break-word",
+                }}
+              >
                 {fighter.name}
               </Typography>
 
               {fighter.nickname ? (
-                <Typography sx={{ opacity: 0.85, fontStyle: "italic" }}>
+                <Typography
+                  sx={{
+                    opacity: 0.85,
+                    fontStyle: "italic",
+                    wordBreak: "break-word",
+                  }}
+                >
                   "{fighter.nickname}"
                 </Typography>
               ) : null}
@@ -68,7 +102,16 @@ export default function FighterCompareCard({ fighter, title }: Props) {
                 <Chip
                   label={fighter.division.name}
                   size="small"
-                  sx={{ bgcolor: "#b71c1c", color: "#fff", fontWeight: 800 }}
+                  sx={{
+                    bgcolor: "#b71c1c",
+                    color: "#fff",
+                    fontWeight: 800,
+                    maxWidth: "100%",
+                    "& .MuiChip-label": {
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    },
+                  }}
                 />
                 <Chip
                   label={`${fighter.wins}-${fighter.losses}-${fighter.draw}`}

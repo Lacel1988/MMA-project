@@ -19,7 +19,6 @@ import {
   getRefreshToken,
   type MeResponse,
 } from "./api/authApi";
-import { tryRefreshAccessToken } from "./api/client";
 import { UnitProvider } from "./context/UnitContext";
 import FilterSidebar from "./components/FilterSidebar";
 
@@ -60,27 +59,28 @@ export default function App() {
 
   useEffect(() => {
     async function initAuth() {
-      const access = localStorage.getItem("access_token");
-      const refresh = getRefreshToken();
+     const access = localStorage.getItem("access_token");
 
-      try {
-        if (!access && refresh) {
-          await tryRefreshAccessToken();
-        }
+     if (!access) {
+       logout();
+       setUser(null);
+        setAktivFül("Auth");
+        return;
+     }
 
+     try {
         const me = await fetchMe();
-        setUser(me);
+       setUser(me);
         setAktivFül("Fighters");
-      } catch {
+     } catch {
         logout();
         setUser(null);
         setAktivFül("Auth");
-      }
-    }
+     }
+   }
 
     initAuth();
   }, []);
-
   useEffect(() => {
     fetch(`${API_URL}/fighters/`)
       .then((res) => {

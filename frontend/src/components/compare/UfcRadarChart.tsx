@@ -17,18 +17,17 @@ type Metrics = {
 };
 
 type Props = {
-  title: string;          
-  fighterName: string;    
+  title: string;
+  fighterName: string;
   metrics?: Metrics | null;
   last: number;
-  color?: string;         
+  color?: string;
 };
 
 function clamp(v: number, max: number) {
   return Math.max(0, Math.min(v, max));
 }
 
-// normalizálás 0-100-ra, hogy egy skálán legyen
 function toPct(value: number, cap: number) {
   return (clamp(value, cap) / cap) * 100;
 }
@@ -48,11 +47,12 @@ export default function UfcRadarChart({
           bgcolor: "rgba(255,255,255,0.04)",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 3,
-          p: 2,
+          p: { xs: 1.5, sm: 2 },
           color: "white",
+          height: "100%",
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 900 }}>
+        <Typography variant="h6" sx={{ fontWeight: 900, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
           {title} Radar
         </Typography>
         <Typography sx={{ opacity: 0.75, mt: 1 }}>
@@ -64,34 +64,39 @@ export default function UfcRadarChart({
 
   const data = [
     {
-      stat: "Significant Strike Accuracy (%)",
+      stat: "Sig. Strike Acc.",
       value: toPct(metrics.sig_str_acc_pct, 100),
       raw: metrics.sig_str_acc_pct,
       unit: "%",
+      fullLabel: "Significant Strike Accuracy (%)",
     },
     {
-      stat: "Takedown Accuracy (%)",
+      stat: "Takedown Acc.",
       value: toPct(metrics.td_acc_pct, 100),
       raw: metrics.td_acc_pct,
       unit: "%",
+      fullLabel: "Takedown Accuracy (%)",
     },
     {
-      stat: "Knockdowns per 15 min",
+      stat: "KD / 15 min",
       value: toPct(metrics.kd_per15, 1.5),
       raw: metrics.kd_per15,
       unit: "",
+      fullLabel: "Knockdowns per 15 min",
     },
     {
-      stat: "Submission Attempts per 15 min",
+      stat: "Sub. Att. / 15",
       value: toPct(metrics.sub_att_per15, 6),
       raw: metrics.sub_att_per15,
       unit: "",
+      fullLabel: "Submission Attempts per 15 min",
     },
     {
-      stat: "Control Time (sec) per 15 min",
+      stat: "Ctrl Time / 15",
       value: toPct(metrics.ctrl_sec_per15, 900),
       raw: metrics.ctrl_sec_per15,
       unit: "sec",
+      fullLabel: "Control Time (sec) per 15 min",
     },
   ];
 
@@ -102,29 +107,42 @@ export default function UfcRadarChart({
         bgcolor: "rgba(255,255,255,0.04)",
         border: "1px solid rgba(255,255,255,0.08)",
         borderRadius: 3,
-        p: 2,
+        p: { xs: 1.5, sm: 2 },
         color: "white",
+        height: "100%",
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 900, }}>
+      <Typography variant="h6" sx={{ fontWeight: 900, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
         {title} Radar
       </Typography>
-      <Typography sx={{ opacity: 0.75, mb: 2 }}>
+
+      <Typography
+        sx={{
+          opacity: 0.75,
+          mb: 2,
+          fontSize: { xs: 13, sm: 15 },
+          wordBreak: "break-word",
+        }}
+      >
         {fighterName} | last {last} fights
       </Typography>
 
-      <Box sx={{ 
-        width: "100%",
-        minWidth: 0, 
-        height: {xs: 280, sm: 320, md: 360},
-        }}>
+      <Box
+        sx={{
+          width: "100%",
+          minWidth: 0,
+          height: { xs: 250, sm: 300, md: 360 },
+        }}
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={data}>
+          <RadarChart data={data} outerRadius="68%">
             <PolarGrid stroke="rgba(255,255,255,0.18)" />
             <PolarAngleAxis
               dataKey="stat"
-              tick={{ fill: "rgba(255,255,255,1.55)", 
-                fontSize: 8 }}
+              tick={{
+                fill: "rgba(255,255,255,0.92)",
+                fontSize: 10,
+              }}
             />
 
             <Tooltip
@@ -139,7 +157,10 @@ export default function UfcRadarChart({
                 if (raw == null) return [val, "Value"];
                 return [`${raw}${unit ? " " + unit : ""}`, "Raw"];
               }}
-              labelFormatter={(label) => label as string}
+              labelFormatter={(_label, payload) => {
+                const first = payload?.[0]?.payload;
+                return first?.fullLabel ?? "";
+              }}
             />
 
             <Radar

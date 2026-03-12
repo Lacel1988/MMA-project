@@ -69,7 +69,7 @@ export async function fetchMe(): Promise<MeResponse> {
   }
 
   return data as MeResponse;
-} 
+}
 
 export function hasAccessToken(): boolean {
   return !!localStorage.getItem("access_token");

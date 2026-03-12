@@ -1,10 +1,6 @@
 const ACCESS_KEY = "access_token";
 const REFRESH_KEY = "refresh_token";
 
-type RefreshResponse = {
-  access: string;
-};
-
 export function setAccessToken(token: string) {
   localStorage.setItem(ACCESS_KEY, token);
 }
@@ -35,73 +31,30 @@ export function clearTokens() {
 }
 
 export async function tryRefreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken();
-
-  if (!refreshToken) {
-    return null;
-  }
-
-  try {
-    const res = await fetch("http://127.0.0.1:8000/api/auth/token/refresh/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refresh: refreshToken }),
-    });
-
-    const data = (await res.json().catch(() => ({}))) as Partial<RefreshResponse & { detail?: string }>;
-
-    if (!res.ok || !data.access) {
-      clearTokens();
-      return null;
-    }
-
-    setAccessToken(data.access);
-    return data.access;
-  } catch {
-    clearTokens();
-    return null;
-  }
+  return null;
 }
 
 export async function apiFetch(url: string, options: RequestInit = {}) {
-  const createHeaders = (token: string | null) => {
-    const headers = new Headers(options.headers || {});
-    const hasBody = options.body !== undefined && options.body !== null;
+  const headers = new Headers(options.headers || {});
+  const hasBody = options.body !== undefined && options.body !== null;
+  const accessToken = getAccessToken();
 
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
-
-    if (hasBody && !headers.has("Content-Type")) {
-      headers.set("Content-Type", "application/json");
-    }
-
-    return headers;
-  };
-
-  let accessToken = getAccessToken();
-
-  let response = await fetch(url, {
-    ...options,
-    headers: createHeaders(accessToken),
-  });
-
-  if (response.status !== 401) {
-    return response;
+  if (accessToken) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
-  const newAccessToken = await tryRefreshAccessToken();
-
-  if (!newAccessToken) {
-    return response;
+  if (hasBody && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
   }
 
-  response = await fetch(url, {
+  const response = await fetch(url, {
     ...options,
-    headers: createHeaders(newAccessToken),
+    headers,
   });
+
+  if (response.status === 401) {
+    clearTokens();
+  }
 
   return response;
 }

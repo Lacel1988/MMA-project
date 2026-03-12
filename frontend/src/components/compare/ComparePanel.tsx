@@ -29,14 +29,12 @@ const inputSx = {
   "& .MuiOutlinedInput-notchedOutline": {
     borderColor: "rgba(255,255,255,0.18)",
   },
-
   "& .MuiAutocomplete-clearIndicator": {
     color: "rgba(255,255,255,0.75)",
   },
   "& .MuiAutocomplete-clearIndicator:hover": {
     color: "#fff",
   },
-
   "& .MuiAutocomplete-popupIndicator": {
     color: "rgba(255,255,255,0.75)",
   },
@@ -45,7 +43,9 @@ const inputSx = {
   },
 };
 
-const inputLabelSx = { color: "rgba(255,255,255,0.75)" };
+const inputLabelSx = {
+  color: "rgba(255,255,255,0.75)",
+};
 
 function divisionIdOf(f: Fighter | null): number | null {
   return f?.division?.id ?? null;
@@ -95,14 +95,20 @@ export default function ComparePanel({
         setLeftRadar(null);
         return;
       }
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
-          left.name
-        )}&last=5`
-      );
-      const data = await res.json();
-      setLeftRadar(data.metrics ?? null);
+
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
+            left.name
+          )}&last=5`
+        );
+        const data = await res.json();
+        setLeftRadar(data.metrics ?? null);
+      } catch {
+        setLeftRadar(null);
+      }
     }
+
     load();
   }, [left]);
 
@@ -112,14 +118,20 @@ export default function ComparePanel({
         setRightRadar(null);
         return;
       }
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
-          right.name
-        )}&last=5`
-      );
-      const data = await res.json();
-      setRightRadar(data.metrics ?? null);
+
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
+            right.name
+          )}&last=5`
+        );
+        const data = await res.json();
+        setRightRadar(data.metrics ?? null);
+      } catch {
+        setRightRadar(null);
+      }
     }
+
     load();
   }, [right]);
 
@@ -129,22 +141,24 @@ export default function ComparePanel({
         display: "flex",
         justifyContent: "center",
         width: "100%",
+        minWidth: 0,
       }}
     >
       <Box
         sx={{
           width: "100%",
           maxWidth: 1100,
+          minWidth: 0,
           display: "grid",
-          gap: 3,
+          gap: { xs: 2, sm: 3 },
         }}
       >
-        {/* SELECTORS */}
         <Box
           sx={{
             display: "grid",
             gap: 2,
             gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            "& > *": { minWidth: 0 },
           }}
         >
           <Autocomplete
@@ -158,6 +172,7 @@ export default function ComparePanel({
             }}
             getOptionLabel={(o) => o.name}
             isOptionEqualToValue={(o, v) => o.id === v.id}
+            fullWidth
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -180,6 +195,7 @@ export default function ComparePanel({
             }}
             getOptionLabel={(o) => o.name}
             isOptionEqualToValue={(o, v) => o.id === v.id}
+            fullWidth
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -192,12 +208,12 @@ export default function ComparePanel({
           />
         </Box>
 
-        {/* CARDS */}
         <Box
           sx={{
             display: "grid",
-            gap: 3,
+            gap: { xs: 2, sm: 3 },
             gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+            alignItems: "stretch",
             "& > *": { minWidth: 0 },
           }}
         >
@@ -205,12 +221,12 @@ export default function ComparePanel({
           <FighterCompareCard fighter={right} title="Fighter B" />
         </Box>
 
-        {/* RADAR CHARTS */}
         <Box
           sx={{
             display: "grid",
-            gap: 3,
+            gap: { xs: 2, sm: 3 },
             gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+            alignItems: "stretch",
             "& > *": { minWidth: 0 },
           }}
         >
@@ -231,7 +247,6 @@ export default function ComparePanel({
           />
         </Box>
 
-        {/* TALE OF THE TAPE */}
         <TaleOfTheTape left={left} right={right} />
       </Box>
     </Box>

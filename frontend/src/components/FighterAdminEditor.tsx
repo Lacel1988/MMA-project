@@ -102,21 +102,32 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
     "& .MuiOutlinedInput-notchedOutline": {
       borderColor: "rgba(255,255,255,0.18)",
     },
+    "& .MuiInputLabel-root": {
+      color: "rgba(255,255,255,0.75)",
+    },
   };
 
   return (
     <Box
       sx={{
         mt: 1.5,
-        p: 1.5,
+        p: { xs: 1.25, sm: 1.5, md: 2 },
         borderRadius: 2,
         border: "1px solid rgba(183,28,28,0.55)",
         bgcolor: "rgba(183,28,28,0.08)",
         display: "grid",
         gap: 1.25,
+        minWidth: 0,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: { xs: "flex-start", sm: "center" },
+          gap: 1,
+          flexWrap: "wrap",
+        }}
+      >
         <Chip
           label="ADMIN MODE"
           size="small"
@@ -127,16 +138,29 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
             letterSpacing: 0.6,
           }}
         />
-        <Typography sx={{ fontSize: 13, color: "#fff", opacity: 0.85 }}>
+
+        <Typography
+          sx={{
+            fontSize: 13,
+            color: "#fff",
+            opacity: 0.85,
+            wordBreak: "break-word",
+          }}
+        >
           Admin-only controls
         </Typography>
 
-        <Box sx={{ flexGrow: 1 }} />
+        <Box sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }} />
 
         <Button
           onClick={handleReset}
           size="small"
-          sx={{ textTransform: "none", fontWeight: 900, color: "rgba(255,255,255,0.9)" }}
+          sx={{
+            textTransform: "none",
+            fontWeight: 900,
+            color: "rgba(255,255,255,0.9)",
+            alignSelf: { xs: "flex-start", sm: "center" },
+          }}
         >
           Reset
         </Button>
@@ -147,6 +171,7 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
         value={nickDraft}
         onChange={(e) => setNickDraft(e.target.value)}
         size="small"
+        fullWidth
         InputLabelProps={{ sx: { color: "rgba(255,255,255,0.75)" } }}
         sx={fieldSx}
       />
@@ -156,6 +181,7 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
         value={descDraft}
         onChange={(e) => setDescDraft(e.target.value)}
         size="small"
+        fullWidth
         multiline
         minRows={2}
         InputLabelProps={{ sx: { color: "rgba(255,255,255,0.75)" } }}
@@ -167,19 +193,27 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
         value={bioDraft}
         onChange={(e) => setBioDraft(e.target.value)}
         size="small"
+        fullWidth
         multiline
         minRows={3}
         InputLabelProps={{ sx: { color: "rgba(255,255,255,0.75)" } }}
         sx={fieldSx}
       />
 
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+          gap: 1,
+        }}
+      >
         <TextField
           label="Wins"
           type="number"
           value={winsDraft}
           onChange={(e) => setWinsDraft(e.target.value)}
           size="small"
+          fullWidth
           InputLabelProps={{ sx: { color: "rgba(255,255,255,0.75)" } }}
           sx={fieldSx}
         />
@@ -189,6 +223,7 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
           value={lossesDraft}
           onChange={(e) => setLossesDraft(e.target.value)}
           size="small"
+          fullWidth
           InputLabelProps={{ sx: { color: "rgba(255,255,255,0.75)" } }}
           sx={fieldSx}
         />
@@ -198,6 +233,7 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
           value={drawDraft}
           onChange={(e) => setDrawDraft(e.target.value)}
           size="small"
+          fullWidth
           InputLabelProps={{ sx: { color: "rgba(255,255,255,0.75)" } }}
           sx={fieldSx}
         />
@@ -206,15 +242,23 @@ export default function FighterAdminEditor({ fighter, onUpdated }: Props) {
       {hiba ? <Typography sx={{ color: "#ff6b6b", fontSize: 13 }}>{hiba}</Typography> : null}
       {ok ? <Typography sx={{ color: "#9cff9c", fontSize: 13 }}>{ok}</Typography> : null}
 
-      <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 1,
+          justifyContent: { xs: "stretch", sm: "flex-end" },
+        }}
+      >
         <Button
           onClick={handleAdminSave}
           disabled={saving}
           variant="contained"
+          fullWidth={false}
           sx={{
             textTransform: "none",
             fontWeight: 900,
             bgcolor: "#b71c1c",
+            width: { xs: "100%", sm: "auto" },
             "&:hover": { bgcolor: "#c62828" },
           }}
         >
