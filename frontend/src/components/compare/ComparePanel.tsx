@@ -4,6 +4,7 @@ import type { Fighter } from "../../types";
 import FighterCompareCard from "./FighterCompareCard";
 import TaleOfTheTape from "./TaleOfTheTape";
 import UfcRadarChart from "./UfcRadarChart";
+import { getAccessToken } from "../../api/client";
 
 type Metrics = {
   sig_str_acc_pct: number;
@@ -97,13 +98,25 @@ export default function ComparePanel({
       }
 
       try {
+        const token = getAccessToken();
+
         const res = await fetch(
-          `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
-            left.name
-          )}&last=5`
+          `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(left.name)}&last=5`,
+          {
+            headers: token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : {},
+          }
         );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         const data = await res.json();
-        setLeftRadar(data.metrics ?? null);
+        setLeftRadar(data.metrics ?? data ?? null);
       } catch {
         setLeftRadar(null);
       }
@@ -120,13 +133,25 @@ export default function ComparePanel({
       }
 
       try {
+        const token = getAccessToken();
+
         const res = await fetch(
-          `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(
-            right.name
-          )}&last=5`
+          `http://127.0.0.1:8000/api/ufc/radar/?fighter=${encodeURIComponent(right.name)}&last=5`,
+          {
+            headers: token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : {},
+          }
         );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         const data = await res.json();
-        setRightRadar(data.metrics ?? null);
+        setRightRadar(data.metrics ?? data ?? null);
       } catch {
         setRightRadar(null);
       }
