@@ -156,7 +156,7 @@ export default function ComparePanel({
         <Box
           sx={{
             display: "grid",
-            gap: 2,
+            gap: { xs: 2, sm: 3, lg: 4 },
             gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
             "& > *": { minWidth: 0 },
           }}
@@ -247,7 +247,9 @@ export default function ComparePanel({
           />
         </Box>
 
-        <TaleOfTheTape left={left} right={right} />
+        <Box sx={{ mt: { xs: 1, sm: 2 } }}>
+          <TaleOfTheTape left={left} right={right} />
+        </Box>
       </Box>
     </Box>
   );

@@ -16,9 +16,9 @@ import type { Fighter } from "./types";
 import {
   fetchMe,
   logout,
-  getRefreshToken,
   type MeResponse,
 } from "./api/authApi";
+
 import { UnitProvider } from "./context/UnitContext";
 import FilterSidebar from "./components/FilterSidebar";
 
@@ -59,30 +59,37 @@ export default function App() {
 
   useEffect(() => {
     async function initAuth() {
-     const access = localStorage.getItem("access_token");
+      const access = localStorage.getItem("access_token");
 
-     if (!access) {
-       logout();
-       setUser(null);
-        setAktivFül("Auth");
-        return;
-     }
-
-     try {
-        const me = await fetchMe();
-       setUser(me);
-        setAktivFül("Fighters");
-     } catch {
+      if (!access) {
         logout();
         setUser(null);
         setAktivFül("Auth");
-     }
-   }
+        return;
+      }
+
+      try {
+        const me = await fetchMe();
+        setUser(me);
+        setAktivFül("Fighters");
+      } catch {
+        logout();
+        setUser(null);
+        setAktivFül("Auth");
+      }
+    }
 
     initAuth();
   }, []);
+
   useEffect(() => {
-    fetch(`${API_URL}/fighters/`)
+    if (!isAuthenticated) return;
+
+    fetch(`${API_URL}/fighters/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to retrieve the data.");
         return res.json();
@@ -92,7 +99,7 @@ export default function App() {
         setKivalasztott((prev) => prev ?? (data.length > 0 ? data[0] : null));
       })
       .catch((err) => setHiba(err.message));
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated && PROTECTED_TABS.includes(aktivFül)) {
@@ -104,6 +111,7 @@ export default function App() {
     logout();
 
     setUser(null);
+    setFighters([]);
     setAktivFül("Auth");
     setLeft(null);
     setRight(null);

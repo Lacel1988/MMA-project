@@ -1,5 +1,3 @@
-# File: backend/fighters/management/commands/sync_recent_fighters_csv.py
-
 import csv
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -44,7 +42,6 @@ def _split_bout(bout: str) -> Tuple[str, str]:
     return _norm_name(a), _norm_name(b)
 
 
-# Kanonikus divízió nevek, amiket a DB-ben is így érdemes tartani
 CANON_DIVS = [
     "Flyweight",
     "Bantamweight",
@@ -64,41 +61,26 @@ CANON_DIVS = [
 
 
 def _extract_division_name(weightclass: str) -> str:
-    """
-    WEIGHTCLASS mezőből stabilan kinyeri a divíziót.
-    Kezeli:
-    - "... Bout" (levág)
-    - "... Title", "Interim", "Championship", "Tournament Title" (nem baj, kulcsszót keressük)
-    - "UFC Superfight Championship" -> Open Weight
-    - "Catchweight Bout" -> Catchweight
-    """
     s = (weightclass or "").strip()
     if not s:
         return ""
 
-    # normalizálás: több space, furcsa apostrophe variánsok
     s = " ".join(s.split())
     s_low = s.lower()
 
-    # speciális esetek
     if "catchweight" in s_low:
         return "Catchweight"
 
-    # "Superfight" tipikusan open weight jelleg, ha nincs más kapaszkodó
     if "superfight" in s_low:
         return "Open Weight"
 
-    # open weight explicit
     if "open weight" in s_low or "openweight" in s_low:
         return "Open Weight"
 
-    # "Bout" végződés levágása, ha csak az zavar
     if s.endswith("Bout"):
-        s = s[: -len("Bout")].strip()
+        s = s[:-len("Bout")].strip()
         s_low = s.lower()
 
-    # Kulcsszavas kivonás: ha tartalmazza valamelyik kanonikus divíziót
-    # Női divíziók előbb, hogy ne akadjon fenn "Flyweight"-en a "Women's Flyweight"
     for div in [
         "Women's Strawweight",
         "Women's Flyweight",
@@ -116,12 +98,11 @@ def _extract_division_name(weightclass: str) -> str:
         if div.lower() in s_low:
             return div
 
-    # Ha még mindig semmi, üres, majd Unknown-ra esik vissza a hívó
     return ""
 
 
 class Command(BaseCommand):
-    help = "Sync fighters from last N days using ufcstats CSVs. Also fills W/L/D and Division."
+    help = "Sync fighters from last N days using UFCStats CSV files. Also fills W/L/D and Division."
 
     def add_arguments(self, parser):
         parser.add_argument("--days", type=int, default=365)
@@ -149,13 +130,12 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f"Missing: {RESULTS_CSV}"))
             return
 
-        # 1) event -> date map + latest date
         event_dates: Dict[str, object] = {}
         latest_date = None
 
         with EVENTS_CSV.open(newline="", encoding="utf-8") as f:
-            r = csv.DictReader(f)
-            for row in r:
+            reader = csv.DictReader(f)
+            for row in reader:
                 ev = (row.get("EVENT") or "").strip()
                 ds = (row.get("DATE") or "").strip()
                 if not ev or not ds:
@@ -178,12 +158,11 @@ class Command(BaseCommand):
         self.stdout.write(f"Cutoff date: {cutoff} (last {days} days)")
         self.stdout.write(f"Events indexed: {len(event_dates)}")
 
-        # 2) collect fighter names in window (from fight_stats.csv)
         names_set: Set[str] = set()
 
         with STATS_CSV.open(newline="", encoding="utf-8") as f:
-            r = csv.DictReader(f)
-            for row in r:
+            reader = csv.DictReader(f)
+            for row in reader:
                 ev = (row.get("EVENT") or "").strip()
                 fighter = _norm_name(row.get("FIGHTER") or "")
                 if not ev or not fighter:
@@ -199,19 +178,16 @@ class Command(BaseCommand):
         names: List[str] = sorted(names_set)
         self.stdout.write(f"Distinct fighters in window: {len(names)}")
 
-        # 3) Precompute W/L/D (career totals across RESULTS_CSV)
         wld: Dict[str, Tuple[int, int, int]] = {}
-
-        # 4) Precompute last seen division name per fighter inside window
         last_div_by_fighter: Dict[str, str] = {}
         last_date_by_fighter: Dict[str, object] = {}
 
         with RESULTS_CSV.open(newline="", encoding="utf-8") as f:
-            r = csv.DictReader(f)
-            for row in r:
+            reader = csv.DictReader(f)
+            for row in reader:
                 ev = (row.get("EVENT") or "").strip()
                 bout = (row.get("BOUT") or "").strip()
-                outcome = (row.get("OUTCOME") or "").strip()  # W/L, L/W, D/D, NC/NC
+                outcome = (row.get("OUTCOME") or "").strip()
                 weightclass_raw = (row.get("WEIGHTCLASS") or "").strip()
 
                 a, b = _split_bout(bout)
@@ -252,15 +228,15 @@ class Command(BaseCommand):
                     last_date_by_fighter[b] = ev_date
                     last_div_by_fighter[b] = div_name
 
-        # 5) Ensure Unknown division if requested
         unknown_div: Optional[Division] = None
-        if ensure_unknown:
+        if ensure_unknown and not dry_run:
             unknown_div, _ = Division.objects.get_or_create(
                 name="Unknown",
                 defaults={"min_weight": 0, "max_weight": 999},
             )
+        elif ensure_unknown:
+            unknown_div = Division.objects.filter(name__iexact="Unknown").first()
 
-        # 6) Load division lookup from DB, create missing if requested
         def _reload_div_lookup() -> Dict[str, Division]:
             divs = list(Division.objects.all())
             return {d.name.strip().lower(): d for d in divs}
@@ -273,15 +249,13 @@ class Command(BaseCommand):
                 return None
             return div_lookup.get(key)
 
-        if create_missing_divisions:
-            # hozzuk létre a kanonikus divíziókat, ha hiányzik
+        if create_missing_divisions and not dry_run:
             for dn in CANON_DIVS:
                 if dn.strip().lower() not in div_lookup:
-                    if not dry_run:
-                        Division.objects.get_or_create(
-                            name=dn,
-                            defaults={"min_weight": 0, "max_weight": 999},
-                        )
+                    Division.objects.get_or_create(
+                        name=dn,
+                        defaults={"min_weight": 0, "max_weight": 999},
+                    )
             div_lookup = _reload_div_lookup()
 
         created = 0
@@ -305,7 +279,8 @@ class Command(BaseCommand):
                 if url_norm:
                     obj = (
                         Fighter.objects
-                        .filter(ufcstats_url__isnull=False)
+                        .exclude(ufcstats_url__isnull=True)
+                        .exclude(ufcstats_url="")
                         .filter(ufcstats_url__iexact=url_norm)
                         .first()
                     )
@@ -316,7 +291,7 @@ class Command(BaseCommand):
                 if obj:
                     changed = False
 
-                    if url_norm and not obj.ufcstats_url:
+                    if url_norm and not (obj.ufcstats_url or "").strip():
                         obj.ufcstats_url = url_norm
                         changed = True
 
@@ -334,11 +309,13 @@ class Command(BaseCommand):
                         if obj.division is None:
                             obj.division = div_obj
                             changed = True
-                        elif ensure_unknown and obj.division and obj.division.name.strip().lower() == "unknown":
-                            # Unknown helyett próbáljuk rátenni a konkrét divíziót
-                            if div_obj.name.strip().lower() != "unknown":
-                                obj.division = div_obj
-                                changed = True
+                        elif (
+                            obj.division
+                            and obj.division.name.strip().lower() == "unknown"
+                            and div_obj.name.strip().lower() != "unknown"
+                        ):
+                            obj.division = div_obj
+                            changed = True
 
                     if changed:
                         if not dry_run:
@@ -360,8 +337,6 @@ class Command(BaseCommand):
                         ufcstats_url=url_norm or None,
                         division=div_obj,
                         age=None,
-                        weight=None,
-                        height=None,
                         wins=wins,
                         losses=losses,
                         draw=draw,
@@ -388,8 +363,8 @@ class Command(BaseCommand):
         )
 
         if show_invalid and invalid_names:
-            self.stdout.write(self.style.WARNING("Invalid (registry mismatch) fighter names (sample):"))
-            for n in invalid_names[: max(0, show_invalid_limit)]:
+            self.stdout.write(self.style.WARNING("Invalid fighter names (sample):"))
+            for n in invalid_names[:max(0, show_invalid_limit)]:
                 self.stdout.write(f"- {n}")
 
             if len(invalid_names) > show_invalid_limit:
