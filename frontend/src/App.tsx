@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Container, Box, Typography, IconButton, Tooltip } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Navbar from "./components/Navbar";
 import FighterGrid from "./components/FighterGrid";
@@ -109,7 +110,6 @@ export default function App() {
 
   function handleLogout() {
     logout();
-
     setUser(null);
     setFighters([]);
     setAktivFül("Auth");
@@ -123,7 +123,6 @@ export default function App() {
       setAktivFül("Auth");
       return;
     }
-
     setAktivFül(nextTab);
   }
 
@@ -132,7 +131,6 @@ export default function App() {
 
     for (const f of fighters as any[]) {
       const d = f?.division;
-
       if (d && typeof d?.id === "number" && typeof d?.name === "string") {
         map.set(d.id, { id: d.id, name: d.name });
       }
@@ -167,7 +165,6 @@ export default function App() {
     }
 
     const exists = filteredFighters.some((x) => x.id === kivalasztott.id);
-
     if (!exists) setKivalasztott(filteredFighters[0] ?? null);
   }, [filteredFighters, aktivFül, kivalasztott]);
 
@@ -176,141 +173,128 @@ export default function App() {
       Error: {hiba}
     </Typography>
   ) : (
-    <>
-      {aktivFül === "Auth" && (
-        <Box
-          sx={{
-            display: "grid",
-            gap: 3,
-            gridTemplateColumns: { xs: "1fr", lg: "520px 1fr" },
-            alignItems: "stretch",
-            minHeight: { lg: `calc(100vh - 48px)` },
-          }}
-        >
-          <Box>
-            <Typography variant="h4" sx={{ mb: 2, color: "white" }}>
-              Auth
-            </Typography>
-
-            <AuthPanel
-              onLoginSuccess={(me) => {
-                setUser(me);
-                setAktivFül("Fighters");
-              }}
-            />
-          </Box>
-
-          <AuthHero
-            images={[
-              "/hero/hero1.jpg",
-              "/hero/hero2.jpg",
-              "/hero/hero3.jpg",
-            ]}
-          />
-        </Box>
-      )}
-
-      {isAuthenticated && aktivFül === "Fighters" && (
-        <Box sx={{ position: "relative" }}>
-          {!filterOpen && (
-            <Tooltip title="Filters">
-              <IconButton
-                onClick={() => setFilterOpen(true)}
-                sx={{
-                  position: "fixed",
-                  left: 16,
-                  top: NAV_H + 16,
-                  zIndex: 1500,
-                  bgcolor: "rgba(0,0,0,0.55)",
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  backdropFilter: "blur(10px)",
-                  color: "white",
-                  "&:hover": {
-                    bgcolor: "rgba(0,0,0,0.75)",
-                  },
-                }}
-              >
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-
-          <FilterSidebar
-            open={filterOpen}
-            onClose={() => setFilterOpen(false)}
-            divisions={divisions}
-            aktivDivisionId={aktivDivisionId}
-            setAktivDivisionId={setAktivDivisionId}
-            search={search}
-            setSearch={setSearch}
-            title="Division filter"
-            navHeight={NAV_H}
-          />
-
-          <Box
-            sx={{
-              display: "grid",
-              gap: 3,
-              gridTemplateColumns: {
-                xs: "1fr",
-                lg: "minmax(0, 2fr) minmax(320px, 1fr)",
-              },
-              alignItems: "start",
-            }}
-          >
-            <Box sx={{ minWidth: 0 }}>
-              <FighterGrid
-                fighters={filteredFighters}
-                selectedId={kivalasztott?.id ?? null}
-                onSelect={(f) => setKivalasztott(f)}
-              />
-            </Box>
-
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={aktivFül}
+        initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <>
+          {aktivFül === "Auth" && (
             <Box
               sx={{
-                minWidth: 0,
-                position: { lg: "sticky" },
-                top: { lg: NAV_H + 12 },
-                alignSelf: "start",
-                maxHeight: {
-                  lg: `calc(100vh - ${NAV_H + 24}px)`,
-                },
-                overflowY: { lg: "auto" },
-                pr: { lg: 1 },
+                display: "grid",
+                gap: 3,
+                gridTemplateColumns: { xs: "1fr", lg: "520px 1fr" },
+                alignItems: "stretch",
+                minHeight: { lg: `calc(100vh - 48px)` },
               }}
             >
-              <FighterDetails
-                fighter={kivalasztott}
-                mode="preview"
-                isAdmin={isAdmin}
+              <Box>
+                <Typography variant="h4" sx={{ mb: 2, color: "white" }}>
+                  Auth
+                </Typography>
+
+                <AuthPanel
+                  onLoginSuccess={(me) => {
+                    setUser(me);
+                    setAktivFül("Fighters");
+                  }}
+                />
+              </Box>
+
+              <AuthHero
+                images={[
+                  "/hero/hero1.jpg",
+                  "/hero/hero2.jpg",
+                  "/hero/hero3.jpg",
+                ]}
               />
             </Box>
-          </Box>
-        </Box>
-      )}
+          )}
 
-      {isAuthenticated && aktivFül === "Details" && (
-        <FighterDetails
-          fighter={kivalasztott}
-          mode="full"
-          isAdmin={isAdmin}
-        />
-      )}
+          {isAuthenticated && aktivFül === "Fighters" && (
+            <Box sx={{ position: "relative" }}>
+              <FilterSidebar
+                open={filterOpen}
+                onClose={() => setFilterOpen(false)}
+                divisions={divisions}
+                aktivDivisionId={aktivDivisionId}
+                setAktivDivisionId={setAktivDivisionId}
+                search={search}
+                setSearch={setSearch}
+                title="Division filter"
+                navHeight={NAV_H}
+              />
 
-      {isAuthenticated && aktivFül === "Compare" && (
-        <ComparePanel
-          fighters={fighters}
-          left={left}
-          right={right}
-          setLeft={setLeft}
-          setRight={setRight}
-        />
-      )}
+              <Box
+                sx={{
+                  display: "grid",
+                  gap: 3,
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    lg: "minmax(0, 2fr) minmax(320px, 1fr)",
+                  },
+                  alignItems: "start",
+                }}
+              >
+                <Box sx={{ minWidth: 0 }}>
+                  <FighterGrid
+                    fighters={filteredFighters}
+                    selectedId={kivalasztott?.id ?? null}
+                    onSelect={(f) => setKivalasztott(f)}
+                  />
+                </Box>
 
-      {isAuthenticated && aktivFül === "Forum" && (
-        <NestedForumPage user={user} />
-      )}
-    </>
+                <Box
+                  sx={{
+                    minWidth: 0,
+                    position: { lg: "sticky" },
+                    top: { lg: NAV_H + 12 },
+                    alignSelf: "start",
+                    maxHeight: {
+                      lg: `calc(100vh - ${NAV_H + 24}px)`,
+                    },
+                    overflowY: { lg: "auto" },
+                    pr: { lg: 1 },
+                  }}
+                >
+                  <FighterDetails
+                    fighter={kivalasztott}
+                    mode="preview"
+                    isAdmin={isAdmin}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {isAuthenticated && aktivFül === "Details" && (
+            <FighterDetails
+              fighter={kivalasztott}
+              mode="full"
+              isAdmin={isAdmin}
+            />
+          )}
+
+          {isAuthenticated && aktivFül === "Compare" && (
+            <ComparePanel
+              fighters={fighters}
+              left={left}
+              right={right}
+              setLeft={setLeft}
+              setRight={setRight}
+            />
+          )}
+
+          {isAuthenticated && aktivFül === "Forum" && (
+            <NestedForumPage user={user} />
+          )}
+        </>
+      </motion.div>
+    </AnimatePresence>
   );
 
   return (
@@ -335,17 +319,34 @@ export default function App() {
             bgcolor: "#0b0b0b",
           }}
         >
-          {aktivFül === "Compare" && isAuthenticated ? (
-            <Box sx={{ py: 3, px: { xs: 2, sm: 3, md: 4 } }}>
-              <Box sx={{ maxWidth: 1100, mx: "auto" }}>
-                {tartalom}
-              </Box>
-            </Box>
-          ) : (
-            <Container maxWidth="xl" sx={{ py: 3 }}>
-              {tartalom}
-            </Container>
-          )}
+          <Container maxWidth="xl" sx={{ py: 3 }}>
+            
+            {/* FIX FILTER GOMB */}
+            {isAuthenticated && aktivFül === "Fighters" && !filterOpen && (
+              <Tooltip title="Filters">
+                <IconButton
+                  onClick={() => setFilterOpen(true)}
+                  sx={{
+                    position: "fixed",
+                    left: 16,
+                    top: NAV_H + 16,
+                    zIndex: 1500,
+                    bgcolor: "rgba(0,0,0,0.55)",
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    backdropFilter: "blur(10px)",
+                    color: "white",
+                    "&:hover": {
+                      bgcolor: "rgba(0,0,0,0.75)",
+                    },
+                  }}
+                >
+                  <FilterListIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {tartalom}
+          </Container>
         </Box>
       </Box>
     </UnitProvider>

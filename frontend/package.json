@@ -16,11 +16,11 @@
     "@mui/material": "^7.3.7",
     "@mui/system": "^7.3.7",
     "@mui/x-tree-view": "^8.26.0",
+    "framer-motion": "^12.38.0",
     "react": "^19.2.0",
-
     "react-dom": "^19.2.0",
-    "react-window": "^1.8.9",
     "react-router-dom": "^7.13.0",
+    "react-window": "^1.8.9",
     "recharts": "^3.6.0"
   },
   "devDependencies": {
