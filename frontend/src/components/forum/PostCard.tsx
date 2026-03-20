@@ -204,7 +204,7 @@ const PostCard: React.FC<Props> = ({
             fullWidth
             multiline
             minRows={2}
-            placeholder="Írd meg a válaszodat..."
+            placeholder="Write your answer…"
             value={replyText ?? ""}
             onChange={(e) => onReplyTextChange(post.id, e.target.value)}
             sx={{
@@ -248,7 +248,7 @@ const PostCard: React.FC<Props> = ({
               borderColor: "rgba(255,255,255,0.18)",
             }}
           >
-            {replyLoading ? "Küldés..." : "Reply küldése"}
+            {replyLoading ? "Sending..." : "Send reply"}
           </Button>
 
           <Stack spacing={1.2} sx={{ mt: 1.5 }}>

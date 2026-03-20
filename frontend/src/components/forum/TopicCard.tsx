@@ -200,7 +200,7 @@ const TopicCard: React.FC<Props> = ({
           fontWeight: 700,
         }}
       >
-        Hozzászólások
+        Comments
       </Typography>
 
       <Paper
@@ -224,14 +224,14 @@ const TopicCard: React.FC<Props> = ({
             fontSize: 14,
           }}
         >
-          Szólj hozzá ehhez a topichoz
+          Comment on this thread.
         </Typography>
 
         <TextField
           fullWidth
           multiline
           minRows={3}
-          placeholder="Írd le a véleményed..."
+          placeholder="Write down your opinion…"
           value={ujPostSzoveg ?? ""}
           onChange={(e) => onUjPostChange(topic.id, e.target.value)}
           sx={{
@@ -270,7 +270,7 @@ const TopicCard: React.FC<Props> = ({
             },
           }}
         >
-          {postKuldesBetoltes ? "Küldés..." : "Hozzászólás küldése"}
+          {postKuldesBetoltes ? "Sending..." : "Send comment"}
         </Button>
       </Paper>
 
@@ -285,7 +285,7 @@ const TopicCard: React.FC<Props> = ({
           }}
         >
           <Typography sx={{ color: "rgba(255,255,255,0.56)" }}>
-            Még nincs hozzászólás ehhez a topichoz.
+            There are no comments on this topic yet.
           </Typography>
         </Paper>
       ) : (

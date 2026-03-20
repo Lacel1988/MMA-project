@@ -21,18 +21,16 @@ INSTALLED_APPS = [
     "corsheaders",
 
     "rest_framework",
-    "rest_framework.authtoken",
     "rest_framework_simplejwt.token_blacklist",
 
     "fighters",
     "ufcstats",
-
     "forum",
 ]
 
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware", 
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -91,10 +89,18 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
+if DEBUG:
+    DEFAULT_AUTH_CLASSES = (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+        "rest_framework.authentication.SessionAuthentication",
+    )
+else:
+    DEFAULT_AUTH_CLASSES = (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTH_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
@@ -103,12 +109,10 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
-
-
 
 
 CORS_ALLOWED_ORIGINS = [

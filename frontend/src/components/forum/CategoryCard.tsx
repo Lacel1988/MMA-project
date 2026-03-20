@@ -168,7 +168,7 @@ const CategoryCard: React.FC<Props> = ({
       <Box sx={{ p: 2 }}>
         {category.topics.length === 0 ? (
           <Typography sx={{ color: "rgba(255,255,255,0.62)" }}>
-            Ebben a kategóriában még nincs topic.
+            There are no topics in this category yet.
           </Typography>
         ) : (
           <Stack spacing={2}>

@@ -150,7 +150,7 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
   }, []);
 
   async function handleDeleteCategory(id: number): Promise<void> {
-    if (!window.confirm("Biztosan törlöd ezt a kategóriát?")) return;
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
 
     try {
       await deleteCategory(id);
@@ -162,7 +162,7 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
   }
 
   async function handleDeleteTopic(id: number): Promise<void> {
-    if (!window.confirm("Biztosan törlöd ezt a topicot?")) return;
+    if (!window.confirm("Are you sure you want to delete this topic?")) return;
 
     try {
       await deleteTopic(id);
@@ -174,7 +174,7 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
   }
 
   async function handleDeletePost(id: number): Promise<void> {
-    if (!window.confirm("Biztosan törlöd ezt a hozzászólást?")) return;
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
 
     try {
       await deletePost(id);
@@ -186,7 +186,7 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
   }
 
   async function handleDeleteReply(id: number): Promise<void> {
-    if (!window.confirm("Biztosan törlöd ezt a választ?")) return;
+    if (!window.confirm("Are you sure you want to delete this reply?")) return;
 
     try {
       await deleteReply(id);
@@ -198,7 +198,7 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
   }
 
   async function handleUnlike(id: number): Promise<void> {
-    if (!window.confirm("Biztosan törlöd ezt a like-ot?")) return;
+    if (!window.confirm("Are you sure you want to delete this like?")) return;
 
     try {
       await unlikePost(id);
@@ -228,7 +228,7 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
     const szoveg = (ujPostSzovegek[topicId] ?? "").trim();
 
     if (!szoveg) {
-      setErrorText("A hozzászólás nem lehet üres.");
+      setErrorText("The comment cannot be empty.");
       return;
     }
 
@@ -255,7 +255,7 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
     const szoveg = (ujReplySzovegek[postId] ?? "").trim();
 
     if (!szoveg) {
-      setErrorText("A reply nem lehet üres.");
+      setErrorText("The reply cannot be empty.");
       return;
     }
 
@@ -293,6 +293,14 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
               onClick={() => {
                 setCategoryForm({ name: "", description: "" });
                 setCategoryDialog(true);
+              }}
+              sx={{
+                backgroundColor: "#c62828",
+                color: "#fff",
+                fontWeight: 700,
+                "&:hover": {
+                  backgroundColor: "#8e0000",
+                },
               }}
             >
               Add Category
@@ -344,30 +352,30 @@ export default function MmaForum({ user }: { user: MeResponse | null }) {
           setCategoryForm({ ...categoryForm, [field]: value })
         }
         onClose={() => setCategoryDialog(false)}
-onSave={async () => {
-  if (!user?.is_superuser) {
-    setErrorText("Ehhez nincs jogosultságod.");
-    setCategoryDialog(false);
-    return;
-  }
+        onSave={async () => {
+          if (!user?.is_superuser) {
+            setErrorText("You do not have permission to do this.");
+            setCategoryDialog(false);
+            return;
+          }
 
-  setSaving(true);
-  try {
-    if (categoryForm.id) {
-      await updateCategory(categoryForm.id, categoryForm);
-    } else {
-      await createCategory(categoryForm);
-    }
+          setSaving(true);
+          try {
+            if (categoryForm.id) {
+              await updateCategory(categoryForm.id, categoryForm);
+            } else {
+              await createCategory(categoryForm);
+            }
 
-    setCategoryDialog(false);
-    await refreshForumTree();
-  } catch (err: any) {
-    console.error(err);
-    setErrorText(err?.message || "Category save failed.");
-  } finally {
-    setSaving(false);
-  }
-}}
+            setCategoryDialog(false);
+            await refreshForumTree();
+          } catch (err: any) {
+            console.error(err);
+            setErrorText(err?.message || "Category save failed.");
+          } finally {
+            setSaving(false);
+          }
+        }}
         saving={saving}
       />
 
