@@ -14,17 +14,26 @@ Testing and validation in this project consist of multiple complementary layers:
 Before running tests or validation commands make sure the backend environment is prepared.
 
 English:
-
+```cmd
 cd backend
+```
+```cmd
 python -m pip install -r requirements.txt
+```
+```cmd
 python manage.py migrate
+```
 
 Magyar:
-
+```cmd
 cd backend
+```
+```cmd
 python -m pip install -r requirements.txt
+```
+```cmd
 python manage.py migrate
-
+```
 ---
 
 # ENGLISH
@@ -39,18 +48,25 @@ Purpose:
 
 Run all backend tests:
 
+```cmd
 cd backend
+```
+```cmd
 python manage.py test
-
+```
 Run tests for a single app:
 
+```cmd
 python manage.py test fighters
+```
+```cmd
 python manage.py test ufcstats
-
+```
 Run a specific test module:
 
+```cmd
 python manage.py test ufcstats.tests.test_model
-
+```
 Notes:
 
 - These tests run against a temporary test database created by Django.
@@ -63,8 +79,9 @@ Notes:
 
 Command:
 
+```cmd
 python manage.py check_fighter_registry
-
+```
 Purpose:
 
 - Verify that every Fighter record stored in the database exists in the UFCStats reference dataset.
@@ -73,9 +90,12 @@ Purpose:
 
 Reference files:
 
+```cmd
 backend/data/ufcstats/ufc_fighter_details.csv
+```
+```cmd
 backend/data/ufcstats/ufc_fighter_tott.csv
-
+```
 Expected output:
 
 OK when all fighter records match the reference dataset.
@@ -95,8 +115,9 @@ FAIL: 1 fighter(s) not found in UFCStats CSV reference:
 
 Command:
 
+```cmd
 python manage.py audit_fighter_name_integrity
-
+```
 Purpose:
 
 - Detect possible typos or manually inserted incorrect fighter names.
@@ -107,16 +128,19 @@ Useful variants:
 
 Only suspicious records:
 
+```cmd
 python manage.py audit_fighter_name_integrity --only-suspects
-
+```
 Limit check size:
 
+```cmd
 python manage.py audit_fighter_name_integrity --limit 50
-
+```
 Strict CI-style check:
 
+```cmd
 python manage.py audit_fighter_name_integrity --only-suspects --fail-on-suspects
-
+```
 What it does:
 
 - [OK] exact match found
@@ -129,8 +153,9 @@ What it does:
 
 Command:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --show-invalid
-
+```
 Purpose:
 
 - Synchronize fighters appearing in recent UFCStats events.
@@ -143,16 +168,19 @@ Useful variants:
 
 Dry-run with invalid sample output:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --show-invalid --show-invalid-limit 30
-
+```
 Dry-run with unknown division fallback:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --ensure-unknown-division
-
+```
 Dry-run with canonical division creation logic enabled:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --create-missing-divisions
-
+```
 What it does:
 
 - indexes recent UFC events
@@ -168,8 +196,9 @@ What it does:
 
 Command:
 
+```cmd
 python manage.py import_ufc_fighters
-
+```
 Purpose:
 
 - Import and update fighter profile attributes from UFCStats CSV files.
@@ -185,12 +214,14 @@ Useful variants:
 
 Dry-run on first 20 records:
 
+```cmd
 python manage.py import_ufc_fighters --limit 20
-
+```
 Full apply mode:
 
+```cmd
 python manage.py import_ufc_fighters --apply
-
+```
 What it does:
 
 - reads fighter profile CSV files
@@ -208,8 +239,9 @@ Note:
 
 Command:
 
+```cmd
 python manage.py import_tott_units --dry-run
-
+```
 Purpose:
 
 - Import Tale of the Tape physical values into the model fields used by the application.
@@ -223,16 +255,19 @@ Useful variants:
 
 Dry-run for first 20 records:
 
+```cmd
 python manage.py import_tott_units --dry-run --limit 20
-
+```
 Full dry-run:
 
+```cmd
 python manage.py import_tott_units --dry-run
-
+```
 Apply changes:
 
+```cmd
 python manage.py import_tott_units
-
+```
 What it does:
 
 - reads ufc_fighter_tott.csv
@@ -246,8 +281,9 @@ What it does:
 
 Command:
 
+```cmd
 python manage.py import_ufc_upload_images --dry-run --limit 20
-
+```
 Purpose:
 
 - Downloads fighter profile images from UFC athlete pages.
@@ -258,20 +294,24 @@ Useful variants:
 
 Dry-run only for fighters missing an image:
 
+```cmd
 python manage.py import_ufc_upload_images --dry-run --limit 20 --only-missing
-
+```
 Dry-run on a larger sample:
 
+```cmd
 python manage.py import_ufc_upload_images --dry-run --limit 50
-
+```
 Apply missing images only:
 
+```cmd
 python manage.py import_ufc_upload_images --only-missing
-
+```
 Force overwrite existing images:
 
+```cmd
 python manage.py import_ufc_upload_images --force
-
+```
 What it does:
 
 - builds athlete page URL from fighter name
@@ -289,6 +329,7 @@ Note:
 
 Recommended safe validation sequence:
 
+```cmd
 cd backend
 python manage.py check_fighter_registry
 python manage.py audit_fighter_name_integrity --only-suspects
@@ -296,7 +337,7 @@ python manage.py import_ufc_fighters --limit 20
 python manage.py import_tott_units --dry-run --limit 20
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --show-invalid
 python manage.py import_ufc_upload_images --dry-run --limit 10 --only-missing
-
+```
 ---
 
 # MAGYAR
@@ -311,18 +352,25 @@ Cél:
 
 Minden backend teszt futtatása:
 
+```cmd
 cd backend
+```
+```cmd
 python manage.py test
-
+```
 Egy adott app tesztjei:
 
+```cmd
 python manage.py test fighters
+```
+```cmd
 python manage.py test ufcstats
-
+```
 Egy konkrét tesztmodul futtatása:
 
+```cmd
 python manage.py test ufcstats.tests.test_model
-
+```
 Megjegyzések:
 
 - A tesztek a Django által létrehozott ideiglenes teszt adatbázisban futnak.
@@ -335,8 +383,9 @@ Megjegyzések:
 
 Parancs:
 
+```cmd
 python manage.py check_fighter_registry
-
+```
 Cél:
 
 - Ellenőrzi, hogy a DB-ben szereplő minden Fighter rekord létezik-e az UFCStats referenciaadatokban.
@@ -345,9 +394,12 @@ Cél:
 
 Referencia fájlok:
 
+```cmd
 backend/data/ufcstats/ufc_fighter_details.csv
+```
+```cmd
 backend/data/ufcstats/ufc_fighter_tott.csv
-
+```
 Várt eredmény:
 
 OK, ha minden fighter illeszkedik a referencia adatokhoz.
@@ -363,8 +415,9 @@ FAIL: 1 fighter(s) not found in UFCStats CSV reference:
 
 Parancs:
 
+```cmd
 python manage.py audit_fighter_name_integrity
-
+```
 Cél:
 
 - Az elgépelések és kézi adatbevitelből eredő hibák felismerése.
@@ -375,16 +428,19 @@ Hasznos változatok:
 
 Csak a gyanús rekordok:
 
+```cmd
 python manage.py audit_fighter_name_integrity --only-suspects
-
+```
 Limitált ellenőrzés:
 
+```cmd
 python manage.py audit_fighter_name_integrity --limit 50
-
+```
 Szigorú, CI-szerű ellenőrzés:
 
+```cmd
 python manage.py audit_fighter_name_integrity --only-suspects --fail-on-suspects
-
+```
 Mit csinál:
 
 - [OK] pontos egyezést talált
@@ -397,8 +453,9 @@ Mit csinál:
 
 Parancs:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --show-invalid
-
+```
 Cél:
 
 - Az utóbbi UFC események alapján fighter rekordokat hoz létre vagy frissít.
@@ -410,16 +467,19 @@ Hasznos változatok:
 
 Dry-run hibás rekordok mintájával:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --show-invalid --show-invalid-limit 30
-
+```
 Dry-run unknown division fallbackkel:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --ensure-unknown-division
-
+```
 Dry-run hiányzó divíziók kezelési logikájával:
 
+```cmd
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --create-missing-divisions
-
+```
 Mit csinál:
 
 - feldolgozza a friss UFC eseményeket
@@ -435,8 +495,9 @@ Mit csinál:
 
 Parancs:
 
+```cmd
 python manage.py import_ufc_fighters
-
+```
 Cél:
 
 - Fighter profiladatok betöltése és frissítése UFCStats CSV fájlokból.
@@ -452,12 +513,14 @@ Hasznos változatok:
 
 Dry-run az első 20 rekordra:
 
+```cmd
 python manage.py import_ufc_fighters --limit 20
-
+```
 Éles futtatás:
 
+```cmd
 python manage.py import_ufc_fighters --apply
-
+```
 Mit csinál:
 
 - beolvassa a fighter profil CSV-ket
@@ -475,8 +538,9 @@ Megjegyzés:
 
 Parancs:
 
+```cmd
 python manage.py import_tott_units --dry-run
-
+```
 Cél:
 
 - A Tale of the Tape fizikai adatok betöltése az alkalmazás által használt mezőkbe.
@@ -490,16 +554,19 @@ Hasznos változatok:
 
 Dry-run az első 20 rekordra:
 
+```cmd
 python manage.py import_tott_units --dry-run --limit 20
-
+```
 Teljes dry-run:
 
+```cmd
 python manage.py import_tott_units --dry-run
-
+```
 Éles futtatás:
 
+```cmd
 python manage.py import_tott_units
-
+```
 Mit csinál:
 
 - beolvassa az ufc_fighter_tott.csv fájlt
@@ -513,8 +580,9 @@ Mit csinál:
 
 Parancs:
 
+```cmd
 python manage.py import_ufc_upload_images --dry-run --limit 20
-
+```
 Cél:
 
 - Fighter profilképek letöltése az UFC athlete oldalakról.
@@ -525,20 +593,24 @@ Hasznos változatok:
 
 Dry-run csak hiányzó képekre:
 
+```cmd
 python manage.py import_ufc_upload_images --dry-run --limit 20 --only-missing
-
+```
 Dry-run nagyobb mintára:
 
+```cmd
 python manage.py import_ufc_upload_images --dry-run --limit 50
-
+```
 Éles futtatás csak hiányzó képekre:
 
+```cmd
 python manage.py import_ufc_upload_images --only-missing
-
+```
 Meglévő képek felülírása:
 
+```cmd
 python manage.py import_ufc_upload_images --force
-
+```
 Mit csinál:
 
 - fighter névből athlete oldal URL-t képez
@@ -556,6 +628,7 @@ Megjegyzés:
 
 Ajánlott biztonságos ellenőrzési sorrend:
 
+```cmd
 cd backend
 python manage.py check_fighter_registry
 python manage.py audit_fighter_name_integrity --only-suspects
@@ -563,7 +636,7 @@ python manage.py import_ufc_fighters --limit 20
 python manage.py import_tott_units --dry-run --limit 20
 python manage.py sync_recent_fighters_csv --days 365 --dry-run --show-invalid
 python manage.py import_ufc_upload_images --dry-run --limit 10 --only-missing
-
+```
 ---
 
 ## Összegzés
