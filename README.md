@@ -46,11 +46,14 @@ A projekt egy lokális secret.py fájlt használ az érzékeny adatok tárolás�
 
 Hozd létre a következő fájlt:
 
-backend/config/secret.py
+```cmd
+echo SECRET_KEY="<IDE_ILLESZD_BE_A_KULCSOT>" > backend/config/secret.py
+```
 
 A fájl tartalma:
-
+```python
 SECRET_KEY = "your-django-secret-key"
+```
 
 Biztonságos Django SECRET_KEY generálható itt:
 https://djecrety.ir/
@@ -64,31 +67,37 @@ A projekt fejlesztés során SQLite adatbázist használ.
 
 Az adatbázis lokálisan jön létre, ezért klónozás után futtasd:
 
+```cmd
 python manage.py migrate
-
+```
 Admin felhasználó létrehozása:
 
+```cmd
 python manage.py createsuperuser
-
+```
 Backend indítása:
 
+```cmd
 python manage.py runserver
-
+```
 
 ## Frontend telepítés
 
 Lépj be a frontend könyvtárba:
 
+```cmd
 cd frontend
-
+```
 Telepítsd a dependency-ket:
 
+```cmd
 npm install
-
+```
 Frontend indítása:
 
+```cmd
 npm run dev
-
+```
 
 ## Tesztelés
 
@@ -112,13 +121,13 @@ The system consists of two main components:
 ## Backend setup
 
 Navigate to the backend directory:
-
+```cmd
 cd backend
-
+```
 Install Python dependencies:
-
+```cmd
 pip install -r requirements.txt
-
+```
 
 ### SECRET_KEY configuration
 
@@ -126,12 +135,14 @@ The project uses a local secret.py file to store sensitive configuration values.
 
 Create the following file:
 
-backend/config/secret.py
+```cmd
+echo SECRET_KEY="<COPY_THE_SECRET_KEY_HERE>" > backend/config/secret.py
+```
 
 Content:
-
+```python
 SECRET_KEY = "your-django-secret-key"
-
+```
 You can generate a secure Django secret key here:
 https://djecrety.ir/
 
@@ -143,32 +154,32 @@ This file is intentionally excluded from version control.
 The project uses a local SQLite database for development.
 
 After cloning the repository run:
-
+```cmd
 python manage.py migrate
-
+```
 Create an admin user:
-
+```cmd
 python manage.py createsuperuser
-
+```
 Start the backend server:
-
+```cmd
 python manage.py runserver
-
+```
 
 ## Frontend setup
 
 Navigate to the frontend directory:
-
+```cmd
 cd frontend
-
+```
 Install dependencies:
-
+```cmd
 npm install
-
+```
 Start the development server:
-
+```cmd
 npm run dev
-
+```
 
 ## Testing
 
