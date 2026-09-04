@@ -63,6 +63,8 @@ const TopicCard: React.FC<Props> = ({
 }) => {
   return (
     <Paper
+      data-testid="forum-topic"
+      data-topic-id={topic.id}
       elevation={0}
       sx={{
         p: 2,
@@ -158,6 +160,7 @@ const TopicCard: React.FC<Props> = ({
           />
 
           <IconButton
+            aria-label={`Edit topic ${topic.title}`}
             size="small"
             onClick={() => {
               setTopicForm({
@@ -174,6 +177,7 @@ const TopicCard: React.FC<Props> = ({
           </IconButton>
 
           <IconButton
+            aria-label={`Delete topic ${topic.title}`}
             size="small"
             onClick={() => onDeleteTopic(topic.id)}
             sx={{ color: "#ff6b6b" }}

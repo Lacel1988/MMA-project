@@ -118,6 +118,7 @@ export default function TaleOfTheTape({
 
   return (
     <Paper
+      data-testid="tale-of-the-tape"
       elevation={0}
       sx={{
         bgcolor: "rgba(255,255,255,0.04)",

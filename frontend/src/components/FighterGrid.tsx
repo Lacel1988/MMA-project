@@ -110,6 +110,8 @@ export default function FighterGrid({ fighters, selectedId, onSelect }: Props) {
   return (
     <Box
       ref={containerRef}
+      data-testid="fighter-grid"
+      aria-label={`${items.length} fighters found`}
       sx={{
         width: "100%",
         minWidth: 0,

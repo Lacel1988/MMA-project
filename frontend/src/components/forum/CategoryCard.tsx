@@ -57,6 +57,8 @@ const CategoryCard: React.FC<Props> = ({
 }) => {
   return (
     <Paper
+      data-testid="forum-category"
+      data-category-id={category.id}
       elevation={0}
       sx={{
         borderRadius: 3,
@@ -140,6 +142,7 @@ const CategoryCard: React.FC<Props> = ({
             </Button>
 
             <IconButton
+              aria-label={`Edit category ${category.name}`}
               size="small"
               onClick={() => {
                 setCategoryForm({
@@ -155,6 +158,7 @@ const CategoryCard: React.FC<Props> = ({
             </IconButton>
 
             <IconButton
+              aria-label={`Delete category ${category.name}`}
               size="small"
               onClick={() => onDeleteCategory(category.id)}
               sx={{ color: "#ff6b6b" }}

@@ -42,6 +42,7 @@ export default function UfcRadarChart({
   if (!metrics) {
     return (
       <Paper
+        data-testid="fighter-radar-empty"
         elevation={0}
         sx={{
           bgcolor: "rgba(255,255,255,0.04)",
@@ -102,6 +103,7 @@ export default function UfcRadarChart({
 
   return (
     <Paper
+      data-testid="fighter-radar-chart"
       elevation={0}
       sx={{
         bgcolor: "rgba(255,255,255,0.04)",

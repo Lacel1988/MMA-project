@@ -84,6 +84,7 @@ function PreviewDetails({
 
   return (
     <Box
+      data-testid="fighter-details"
       sx={{
         bgcolor: "rgba(255,255,255,0.04)",
         border: "1px solid rgba(255,255,255,0.08)",
@@ -266,6 +267,7 @@ function FullTimelineDetails({ fighter }: { fighter: Fighter }) {
 
   return (
     <Box
+      data-testid="fighter-details-full"
       sx={{
         position: "relative",
         borderRadius: 3,

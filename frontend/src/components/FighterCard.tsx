@@ -132,6 +132,8 @@ function FighterCardInner({ fighter, selected, onClick }: Props) {
 
   return (
     <Card
+      data-testid="fighter-card"
+      data-fighter-id={fighter.id}
       onClick={onClick}
       sx={{
         position: "relative",

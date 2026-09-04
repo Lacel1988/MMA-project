@@ -17,3 +17,10 @@ forum/__pycache__/
 *.pyc
 node_modules/
 frontend/node_modules/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+backend/db.e2e.sqlite3
+.e2e-python-packages/

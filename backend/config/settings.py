@@ -1,6 +1,15 @@
+import os
 from pathlib import Path
 from datetime import timedelta
-from .secret import SECRET_KEY
+try:
+    from .secret import SECRET_KEY
+except ImportError:
+    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+
+if not SECRET_KEY:
+    raise RuntimeError(
+        "Django SECRET_KEY is missing. Create config/secret.py or set DJANGO_SECRET_KEY."
+    )
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -64,7 +73,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.environ.get("MMA_DATABASE_PATH", BASE_DIR / "db.sqlite3"),
     }
 }
 
